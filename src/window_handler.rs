@@ -6,8 +6,6 @@ use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurr
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::ControlFlow;
 
-use crate::world::{World};
-
 pub struct WindowHandler {
     gl: Context,
     window: ContextWrapper<PossiblyCurrent, Window>,
@@ -46,15 +44,13 @@ impl WindowHandler {
             event_loop,
         } = self;
 
-        let world = World::new(100, 200);
-
 
         {
             let mut updates = 0;
             let mut renders = 0;
             let update_timer = Instant::now();
             let second = 1_000_000_000;
-            let tick_rate: u64 = 64;
+            let tick_rate: u64 = 128;
             let tick_time: u64 = second as u64 / tick_rate;
             let mut tick_timer = 0;
             let mut cumulative_time: u128 = 0;
@@ -67,7 +63,7 @@ impl WindowHandler {
                         while cumulative_time < update_timer.elapsed().as_nanos(){
                             cumulative_time += tick_time as u128;
                             updates += 1;
-                            world.update();
+                    
                         }
 
                         if tick_timer < update_timer.elapsed().as_nanos(){
