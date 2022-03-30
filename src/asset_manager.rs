@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs::File, io::BufReader};
 use glow::{Context, HasContext, NativeProgram};
-use obj::{Obj, TexturedVertex, load_obj};
+use obj::{TexturedVertex, load_obj};
 
 use crate::model::Model;
 

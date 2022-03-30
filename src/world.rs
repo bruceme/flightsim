@@ -1,18 +1,27 @@
 use cgmath::Vector2;
-use crate::entity::{Entity};
+use glow::Context;
+use crate::{entity::{Entity}, asset_manager::AssetManager};
 
 pub struct World{
-    size: Vector2<f32>,
     objects: Vec::<Entity>,
     render_order: Vec::<i32>,
+    asset_manager: AssetManager,
 }
 
 impl World{
-    pub fn update() -> (){
+    pub fn new() -> Self{
+        Self{
+            objects: Vec::new(),
+            render_order: Vec::new(),
+            asset_manager: AssetManager::new(),
+        }
+    }
+
+    pub fn update(gl: Context) -> (){
 
     }
 
-    pub fn render() -> (){
+    pub fn render(gl: Context) -> (){
         
     }
 }
