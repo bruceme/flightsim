@@ -1,0 +1,29 @@
+pub trait AsRawBytes {
+    fn as_raw_bytes(&self) -> &[u8];
+}
+
+impl<T: Copy> AsRawBytes for &[T] {
+    fn as_raw_bytes(&self) -> &[u8] {
+        generic_slice_as_u8_slice(*self)
+    }
+}
+
+impl<T: Copy> AsRawBytes for Vec<T> {
+    fn as_raw_bytes(&self) -> &[u8] {
+        generic_slice_as_u8_slice(self.as_slice())
+    }
+}
+
+impl<T: Copy, const LEN: usize> AsRawBytes for [T; LEN] {
+    fn as_raw_bytes(&self) -> &[u8] {
+        generic_slice_as_u8_slice(self.as_slice())
+    }
+}
+
+fn generic_slice_as_u8_slice<'a, T: Copy>(slice: &'a [T]) -> &'a [u8] {
+    unsafe {
+        let len = slice.len() * std::mem::size_of::<T>();
+        let ptr = std::mem::transmute::<_, *mut u8>(slice.as_ptr());
+        std::slice::from_raw_parts_mut(ptr, len)
+    }
+}

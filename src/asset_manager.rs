@@ -1,15 +1,14 @@
-use std::{collections::HashMap, fs::File, io::BufReader};
+use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
 use glow::{Context, HasContext, NativeProgram};
 use obj::{TexturedVertex, load_obj};
 
-use crate::model::Model;
+use crate::{model::Model, window_handler::GlContext};
 
 
 
 pub struct AssetManager{
     loaded_shaders: HashMap<String, NativeProgram>,
 }
-
 
 impl AssetManager{
     pub fn new() -> Self{
@@ -18,7 +17,7 @@ impl AssetManager{
         }
     }
 
-    pub fn load_shaders(&self, gl: Context, vert_name: &str, frag_name: &str) -> NativeProgram{
+    fn load_shaders(&self, gl: GlContext, vert_name: &'static str, frag_name: &'static str) -> NativeProgram{
         if let Some(index) = self.loaded_shaders.get(vert_name) {
             return *index;
         }
@@ -61,7 +60,11 @@ impl AssetManager{
         program
     }
 
-    pub fn load_obj(&self, gl: Context, file: &str) -> Model{
+    pub fn load_textures<P: AsRef<Path>>(&self, textures: &[P]){
+
+    }
+
+    pub fn load_obj(&self, gl: GlContext, file: impl AsRef<Path>, vert_shader: &'static str, frag_shader: &'static str) -> Model{
         let file_data = BufReader::new(File::open(file).expect("Could not open file: {file}"));
         let model = load_obj::<TexturedVertex, _, u32>(file_data).expect("Could not parse file to Model: {file}");
 
@@ -74,12 +77,9 @@ impl AssetManager{
             tex.push(vertex.texture[0..1].try_into().unwrap());
             norm.push(vertex.normal);
         }
-        
-        Model{
-            vertices: vert,
-            indices: model.indices,
-            texies: tex,
-            normals: norm,
-        }
+
+        Model::new(gl.clone(), vert, tex, norm, model.indices, self.load_shaders(gl.clone(), vert_shader, frag_shader))
     }
+
+    
 }

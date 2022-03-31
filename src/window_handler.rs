@@ -1,13 +1,36 @@
 
 use std::time::{Instant, Duration};
+use std::rc::Rc;
+use std::ops::Deref;
 
 use glow::{Context, HasContext};
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::ControlFlow;
 
+#[derive(Clone, Debug)]
+pub struct GlContext {
+    gl: Rc<Context>,
+}
+
+impl GlContext {
+    pub fn new(gl: Context) -> Self {
+        Self {
+            gl: Rc::new(gl),
+        }
+    }
+}
+
+impl Deref for GlContext {
+    type Target = Context;
+
+    fn deref(&self) -> &Self::Target {
+        &self.gl
+    }
+}
+
 pub struct WindowHandler {
-    gl: Context,
+    gl: GlContext,
     window: ContextWrapper<PossiblyCurrent, Window>,
     event_loop: EventLoop<()>,
 }
@@ -28,7 +51,7 @@ impl WindowHandler {
                 .make_current()
                 .unwrap();
             let gl =
-                glow::Context::from_loader_function(|s| window.get_proc_address(s) as *const _);
+                GlContext::new(glow::Context::from_loader_function(|s| window.get_proc_address(s) as *const _));
             Self {
                 gl,
                 window,
@@ -43,7 +66,6 @@ impl WindowHandler {
             window,
             event_loop,
         } = self;
-
 
         {
             let mut updates = 0;

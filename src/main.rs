@@ -5,6 +5,7 @@ mod world;
 mod entity;
 mod asset_manager;
 mod model;
+mod helper;
 
 fn main() {
     WindowHandler::new(1600, 900, false).run();
