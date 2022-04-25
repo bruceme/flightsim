@@ -1,10 +1,12 @@
 use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
-use glow::{Context, HasContext, NativeProgram};
+use glow::{Context, HasContext, NativeProgram, Texture};
 use obj::{TexturedVertex, load_obj};
 
 use crate::{model::Model, window_handler::GlContext};
 
+use self::load_image::load_texture;
 
+mod load_image;
 
 pub struct AssetManager{
     loaded_shaders: HashMap<String, NativeProgram>,
@@ -60,11 +62,23 @@ impl AssetManager{
         program
     }
 
-    pub fn load_textures<P: AsRef<Path>>(&self, textures: &[P]){
-
+    pub fn load_textures<P: AsRef<Path>>(&self, gl: &GlContext, textures: &[P]) -> Vec::<Texture>{
+        let mut loaded_textures = Vec::<Texture>::new();
+        for texture_name in textures.into_iter(){
+            let image = load_image::load_texture(texture_name).expect("Texture could not load properly {texture}");
+            loaded_textures.push(unsafe{
+                let texture = gl.create_texture().unwrap();
+                gl.bind_texture(glow::TEXTURE_2D, Some(texture));
+                gl.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MIN_FILTER, glow::LINEAR as i32);
+                gl.tex_parameter_i32(glow::TEXTURE_2D, glow::TEXTURE_MAG_FILTER, glow::LINEAR as i32);
+                gl.tex_image_2d(glow::TEXTURE_2D, 0, glow::RGBA8 as i32, image.width() as i32, image.height() as i32, 0, glow::UNSIGNED_BYTE, glow::RGBA8, Some(image.as_raw()));
+                texture
+            });
+        }
+        loaded_textures
     }
 
-    pub fn load_obj(&self, gl: GlContext, file: impl AsRef<Path>, vert_shader: &'static str, frag_shader: &'static str) -> Model{
+    pub fn load_obj(&self, gl: &GlContext, file: impl AsRef<Path>, vert_shader: &'static str, frag_shader: &'static str, texture_files: &[&str]) -> Model{
         let file_data = BufReader::new(File::open(file).expect("Could not open file: {file}"));
         let model = load_obj::<TexturedVertex, _, u32>(file_data).expect("Could not parse file to Model: {file}");
 
@@ -78,7 +92,9 @@ impl AssetManager{
             norm.push(vertex.normal);
         }
 
-        Model::new(gl.clone(), vert, tex, norm, model.indices, self.load_shaders(gl.clone(), vert_shader, frag_shader))
+        let textures = self.load_textures(gl,&texture_files);
+
+        Model::new(gl.clone(), vert, tex, norm, model.indices, self.load_shaders(gl.clone(), vert_shader, frag_shader), textures)
     }
 
     

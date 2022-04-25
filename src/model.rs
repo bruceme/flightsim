@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use cgmath::Matrix4;
-use glow::{Context, NativeProgram, HasContext, NativeBuffer, NativeVertexArray, UNSIGNED_INT};
+use glow::{Context, NativeProgram, HasContext, NativeBuffer, NativeVertexArray, Texture};
 
 use crate::{window_handler::GlContext, helper::AsRawBytes};
 
@@ -13,12 +13,12 @@ pub struct Model{
     vao: NativeVertexArray,
 
     program: NativeProgram,
-    gl: GlContext,
+    textures: Vec<Texture>,
 }
 
 impl Model{
 
-    pub fn new(gl: GlContext, vertices: Vec<[f32;3]>, texies: Vec<[f32; 2]>, normals: Vec<[f32; 3]>, indices: Vec<u32>, program: NativeProgram) -> Self{  
+    pub fn new(gl: GlContext, vertices: Vec<[f32;3]>, texies: Vec<[f32; 2]>, normals: Vec<[f32; 3]>, indices: Vec<u32>, program: NativeProgram, textures: Vec::<Texture>) -> Self{  
         
         let vao = unsafe {
             let vao = gl.create_vertex_array().unwrap();
@@ -56,7 +56,7 @@ impl Model{
             indices,
             vao,
             program,
-            gl,
+            textures
         }
     }
 
@@ -69,7 +69,7 @@ impl Model{
 
             gl.uniform_1_f32(gl.get_uniform_location(self.program, "time").as_ref(), time);
 
-            gl.draw_elements(glow::TRIANGLES, self.indices.len() as i32, UNSIGNED_INT, 0);
+            gl.draw_elements(glow::TRIANGLES, self.indices.len() as i32, glow::UNSIGNED_INT, 0);
         }
     }
 }

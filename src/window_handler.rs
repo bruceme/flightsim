@@ -8,6 +8,8 @@ use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurr
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::ControlFlow;
 
+use crate::world::World;
+
 #[derive(Clone, Debug)]
 pub struct GlContext {
     gl: Rc<Context>,
@@ -66,7 +68,7 @@ impl WindowHandler {
             window,
             event_loop,
         } = self;
-
+        let world = World::new(&gl);
         {
             let mut updates = 0;
             let mut renders = 0;
@@ -98,8 +100,9 @@ impl WindowHandler {
                         window.window().request_redraw();
                     }
                     Event::RedrawRequested(_) => {
-                        renders += 1;
+                        world.render();
                         window.swap_buffers().unwrap();
+                        renders += 1;
                     }
                     Event::WindowEvent { ref event, .. } => match event {
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
