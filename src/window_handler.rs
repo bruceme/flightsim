@@ -1,8 +1,9 @@
 
 use std::time::{Instant, Duration};
 use std::rc::Rc;
-use std::ops::Deref;
+use std::ops::{Deref, Mul};
 
+use cgmath::{Rad, Matrix4, Perspective, PerspectiveFov, Point3, Vector3};
 use glow::{Context, HasContext};
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
 use glutin::event::{Event, WindowEvent};
@@ -35,6 +36,12 @@ pub struct WindowHandler {
     gl: GlContext,
     window: ContextWrapper<PossiblyCurrent, Window>,
     event_loop: EventLoop<()>,
+}
+
+pub struct Camera {
+    eye: Point3<f32>,
+    direction: Point3<f32>,
+    up: Vector3<f32>,
 }
 
 impl WindowHandler {
@@ -70,14 +77,37 @@ impl WindowHandler {
         } = self;
         let world = World::new(&gl);
         {
+            unsafe{
+                gl.clear_color(0.0, 0.0, 0.0, 1.0);
+            }
+
+            let mut perspective_struct = PerspectiveFov::<f32> {
+                fovy: Rad(90.0),
+                aspect: window.window().inner_size().width as f32 / window.window().inner_size().height as f32,
+                near: 0.1,
+                far: 30.0,
+            };
+
+            let mut perspective = Matrix4::from(perspective_struct.to_perspective());
+
+            let eye = Point3::<f32>::new(0.0, 0.0, 0.0);
+            let direction = Point3::<f32>::new(0.0, 0.0, -1.0);
+            let up = Vector3::<f32>::new(0.0, 1.0, 0.0);
+
+        let camera = Camera { eye, direction, up };
+            
             let mut updates = 0;
             let mut renders = 0;
+            let mut last_update = Instant::now();
             let update_timer = Instant::now();
             let second = 1_000_000_000;
             let tick_rate: u64 = 128;
             let tick_time: u64 = second as u64 / tick_rate;
             let mut tick_timer = 0;
             let mut cumulative_time: u128 = 0;
+
+            
+
 
             event_loop.run(move |event, _, control_flow| {
                 *control_flow = ControlFlow::Poll;
@@ -87,7 +117,6 @@ impl WindowHandler {
                         while cumulative_time < update_timer.elapsed().as_nanos(){
                             cumulative_time += tick_time as u128;
                             updates += 1;
-                    
                         }
 
                         if tick_timer < update_timer.elapsed().as_nanos(){
@@ -96,19 +125,36 @@ impl WindowHandler {
                             updates = 0;
                             renders = 0;
                         }
-
                         window.window().request_redraw();
                     }
                     Event::RedrawRequested(_) => {
-                        world.render();
+                        unsafe{
+                            gl.clear(glow::DEPTH_BUFFER_BIT | glow::COLOR_BUFFER_BIT);
+                        }
+
+                        let view = Matrix4::look_at_rh(camera.eye, camera.direction, camera.up);
+
+                        let cam_per: [f32; 16] = *perspective.mul(view).as_ref();
+
+                        world.render(&update_timer.duration_since(last_update).as_secs_f32(), &cam_per);
                         window.swap_buffers().unwrap();
+                        last_update = update_timer;
                         renders += 1;
+                        
                     }
                     Event::WindowEvent { ref event, .. } => match event {
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             window.resize(**new_inner_size);
                         }
                         WindowEvent::Resized(size) => unsafe {
+                            perspective_struct = PerspectiveFov::<f32> {
+                                fovy: Rad(90.0),
+                                aspect: size.width as f32 / size.height as f32,
+                                near: 0.1,
+                                far: 30.0,
+                            };
+                    
+                            perspective = Matrix4::from(perspective_struct.to_perspective());
                             gl.viewport(0, 0, size.width as i32, size.height as i32);
                         },
                         WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,

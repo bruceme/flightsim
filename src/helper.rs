@@ -1,3 +1,6 @@
+use crate::window_handler::GlContext;
+use glow::{HasContext};
+
 pub trait AsRawBytes {
     fn as_raw_bytes(&self) -> &[u8];
 }
@@ -26,4 +29,15 @@ fn generic_slice_as_u8_slice<'a, T: Copy>(slice: &'a [T]) -> &'a [u8] {
         let ptr = std::mem::transmute::<_, *mut u8>(slice.as_ptr());
         std::slice::from_raw_parts_mut(ptr, len)
     }
+}
+
+pub fn gl_get_error(gl: &GlContext) {
+    unsafe{
+        loop {
+            match gl.get_error(){
+                glow::NO_ERROR => break,
+                error => println!("GL errno: 0x{:x?}", error),
+            }
+        }
+    }   
 }

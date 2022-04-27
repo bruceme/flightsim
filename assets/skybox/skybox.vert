@@ -9,11 +9,12 @@ out vec2 frag_texies;
 out vec3 frag_normals;
 
 uniform mat4 view;
-uniform mat4 projection;
+//uniform mat4 projection;
 
 void main(void)
 {
 	frag_texies = texies;
+    frag_normals = normals;
 
-	gl_Position =  projection * view * vec4(vertices, 1.0);
+	gl_Position = view * vec4(vertices, 1.0);
 }
