@@ -1,16 +1,16 @@
 
-use std::time::{Instant, Duration};
+use std::time::{Instant};
 use std::rc::Rc;
 use std::ops::{Deref, Mul};
 
-use cgmath::{Rad, Matrix4, Perspective, PerspectiveFov, Point3, Vector3};
+use cgmath::{Rad, Matrix4, PerspectiveFov, Point3, Vector3};
 use glow::{Context, HasContext};
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
-use glutin::event::{Event, WindowEvent};
+use glutin::event::{Event, WindowEvent, DeviceEvent};
 use glutin::event_loop::ControlFlow;
 
+use crate::input_handler::{InputHandler, self};
 use crate::world::World;
-
 #[derive(Clone, Debug)]
 pub struct GlContext {
     gl: Rc<Context>,
@@ -75,8 +75,10 @@ impl WindowHandler {
             window,
             event_loop,
         } = self;
-        let world = World::new(&gl);
+        
         {
+            let world = World::new(&gl);
+            let mut input_handler = InputHandler::new();
             unsafe{
                 gl.clear_color(0.0, 0.0, 0.0, 1.0);
             }
@@ -116,6 +118,7 @@ impl WindowHandler {
                     Event::MainEventsCleared => {
                         while cumulative_time < update_timer.elapsed().as_nanos(){
                             cumulative_time += tick_time as u128;
+                            world.update(input_handler.get_key_state());
                             updates += 1;
                         }
 
@@ -142,6 +145,12 @@ impl WindowHandler {
                         renders += 1;
                         
                     }
+                    Event::DeviceEvent { ref event, .. } => match event{
+                        DeviceEvent::Key(input) =>{
+                            input_handler.key_pressed(input);
+                        }
+                        _=>(),
+                    },
                     Event::WindowEvent { ref event, .. } => match event {
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             window.resize(**new_inner_size);

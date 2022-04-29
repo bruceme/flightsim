@@ -1,7 +1,5 @@
-use cgmath::{Vector2, Vector3};
-use glow::Context;
-use obj::raw::object;
-use crate::{entity::{Entity}, asset_manager::{AssetManager, self}, window_handler::GlContext};
+use cgmath::{Vector3};
+use crate::{entity::{Entity}, asset_manager::{AssetManager, self}, window_handler::GlContext, input_handler::KeyState};
 
 pub struct World{
     gl: GlContext,
@@ -26,8 +24,8 @@ impl World{
         }
     }
 
-    pub fn update(&self) -> (){
-
+    pub fn update(&self, key_state: &KeyState) -> (){
+        self.objects.iter().for_each(|object| object.update(key_state));
     }
 
     pub fn render(&self, time: &f32, cam_per: &[f32; 16]) -> (){
