@@ -4,12 +4,14 @@ pub struct InputHandler{
     key_state: KeyState
 }
 
+#[derive(Debug)]
 pub struct KeyState{
-    up: bool,
-    down: bool,
-    left: bool,
-    right: bool,
-    accelerate: bool,
+    pub up: bool,
+    pub down: bool,
+    pub left: bool,
+    pub right: bool,
+    pub accelerate: bool,
+    pub escape: bool,
 }
 
 impl InputHandler{
@@ -21,6 +23,7 @@ impl InputHandler{
                 left: false,
                 right: false,
                 accelerate: false,
+                escape: false,
             }
         }
     }
@@ -42,7 +45,12 @@ impl InputHandler{
                 },
                 VirtualKeyCode::Space | VirtualKeyCode::LControl =>{
                     self.key_state.accelerate = input.state == ElementState::Pressed;
-                }
+                },
+                VirtualKeyCode::Escape=>{
+                    if input.state == ElementState::Released {
+                        self.key_state.escape = !self.key_state.escape;
+                    }      
+                },
                 _=> ()
             }
         }
