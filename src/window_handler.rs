@@ -117,7 +117,7 @@ impl WindowHandler {
             let tick_time: u64 = second as u64 / tick_rate;
             let mut tick_timer = 0;
             let mut cumulative_time: u128 = 0;
-
+            let mut focus = true; 
             let sensitivity: f32 = 0.005;
 
             let mut pitch: f32 = 0.0;
@@ -162,10 +162,10 @@ impl WindowHandler {
                     }
                     Event::DeviceEvent { ref event, .. } => match event{
                         DeviceEvent::MouseMotion { delta } => {
-                            if !input_handler.get_key_state().escape {
+                            if focus && !input_handler.get_key_state().escape {
                                 let win = window.window();
                                 win.set_cursor_position(Position::from(PhysicalPosition::new(win.inner_size().width / 2, win.inner_size().height / 2))).unwrap();
-                                pitch += delta.0 as f32 * sensitivity;
+                                pitch -= delta.0 as f32 * sensitivity;
                                 yaw += delta.1 as f32 * sensitivity;
                                 let pitch_mat= Matrix4::<f32>::from_angle_y(Rad(pitch));
                                 let yaw_mat = Matrix4::<f32>::from_angle_x(Rad(yaw));
@@ -180,6 +180,9 @@ impl WindowHandler {
                         _ => (),
                     },
                     Event::WindowEvent { ref event, .. } => match event {
+                        WindowEvent::Focused(focused) => {
+                            focus = *focused;
+                        }
                         WindowEvent::KeyboardInput { input, .. } => {
                             input_handler.key_pressed(input);
                         }

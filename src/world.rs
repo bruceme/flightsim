@@ -12,7 +12,7 @@ impl World{
     pub fn new(gl: &GlContext) -> Self{
         let mut objects = Vec::<Entity>::new();
         let asset_manager =AssetManager::new();
-        let skybox = Entity::new(gl, &asset_manager, "assets/skybox/untitled.obj", "assets/skybox/skybox.vert", "assets/skybox/skybox.frag", &["assets/skybox/skybox512.png"], Vector3::new(0.0, 0.0, 0.0));
+        let skybox = Entity::new(gl, &asset_manager, "assets/skybox/skybox.obj", "assets/skybox/skybox.vert", "assets/skybox/skybox.frag", &["assets/skybox/skybox.png"], Vector3::new(0.0, 0.0, 0.0));
 
         objects.push(skybox);
 
