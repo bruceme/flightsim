@@ -1,5 +1,5 @@
 use crate::window_handler::GlContext;
-use glow::{HasContext};
+use glow::HasContext;
 
 pub trait AsRawBytes {
     fn as_raw_bytes(&self) -> &[u8];
@@ -32,12 +32,12 @@ fn generic_slice_as_u8_slice<'a, T: Copy>(slice: &'a [T]) -> &'a [u8] {
 }
 
 pub fn gl_get_error(gl: &GlContext) {
-    unsafe{
+    unsafe {
         loop {
-            match gl.get_error(){
+            match gl.get_error() {
                 glow::NO_ERROR => break,
                 error => println!("GL errno: 0x{:x?}", error),
             }
         }
-    }   
+    }
 }

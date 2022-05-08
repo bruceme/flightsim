@@ -1,11 +1,11 @@
-use glutin::event::{KeyboardInput, VirtualKeyCode, ElementState};
+use glutin::event::{ElementState, KeyboardInput, VirtualKeyCode};
 
-pub struct InputHandler{
-    key_state: KeyState
+pub struct InputHandler {
+    key_state: KeyState,
 }
 
 #[derive(Debug)]
-pub struct KeyState{
+pub struct KeyState {
     pub up: bool,
     pub down: bool,
     pub left: bool,
@@ -14,49 +14,49 @@ pub struct KeyState{
     pub escape: bool,
 }
 
-impl InputHandler{
-    pub fn new() -> Self{
-        Self{
-            key_state: KeyState{
+impl InputHandler {
+    pub fn new() -> Self {
+        Self {
+            key_state: KeyState {
                 up: false,
                 down: false,
                 left: false,
                 right: false,
                 accelerate: false,
                 escape: false,
-            }
+            },
         }
     }
 
-    pub fn key_pressed(&mut self, input: &KeyboardInput){
-        if let Some(vk) = input.virtual_keycode{
+    pub fn key_pressed(&mut self, input: &KeyboardInput) {
+        if let Some(vk) = input.virtual_keycode {
             match vk {
-                VirtualKeyCode::W =>{
+                VirtualKeyCode::W => {
                     self.key_state.up = input.state == ElementState::Pressed;
                 }
-                VirtualKeyCode::A =>{
+                VirtualKeyCode::A => {
                     self.key_state.down = input.state == ElementState::Pressed;
                 }
-                VirtualKeyCode::S =>{
+                VirtualKeyCode::S => {
                     self.key_state.left = input.state == ElementState::Pressed;
                 }
-                VirtualKeyCode::D=>{
+                VirtualKeyCode::D => {
                     self.key_state.right = input.state == ElementState::Pressed;
-                },
-                VirtualKeyCode::Space | VirtualKeyCode::LControl =>{
+                }
+                VirtualKeyCode::Space | VirtualKeyCode::LControl => {
                     self.key_state.accelerate = input.state == ElementState::Pressed;
-                },
-                VirtualKeyCode::Escape=>{
+                }
+                VirtualKeyCode::Escape => {
                     if input.state == ElementState::Released {
                         self.key_state.escape = !self.key_state.escape;
-                    }      
-                },
-                _=> ()
+                    }
+                }
+                _ => (),
             }
         }
     }
 
-    pub fn get_key_state(&self) -> &KeyState{
+    pub fn get_key_state(&self) -> &KeyState {
         &self.key_state
     }
 }
