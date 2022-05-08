@@ -1,4 +1,5 @@
 
+use std::f32::consts::{FRAC_PI_8, PI};
 use std::time::{Instant};
 use std::rc::Rc;
 use std::ops::{Deref, Mul, Add};
@@ -9,6 +10,8 @@ use glutin::dpi::{PhysicalSize, PhysicalPosition, Position};
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
 use glutin::event::{Event, WindowEvent, DeviceEvent, DeviceId};
 use glutin::event_loop::ControlFlow;
+use std::cmp::{max, min};
+use std::f32::consts;
 
 use crate::input_handler::{InputHandler, self};
 use crate::world::World;
@@ -44,6 +47,33 @@ pub struct Camera {
     direction: Vector3<f32>,
     up: Vector3<f32>,
 }
+
+
+// #[macro_export]
+// macro_rules! min {
+//     ($x: expr) => ($x);
+//     ($x: expr, $($z: expr),+) => {{
+//         let y = min!($($z),*);
+//         if $x < y {
+//             $x
+//         } else {
+//             y
+//         }
+//     }}
+// }
+
+// #[macro_export]
+// macro_rules! max {
+//     ($x: expr) => ($x);
+//     ($x: expr, $($z: expr),+) => {{
+//         let y = max!($($z),*);
+//         if $x > y {
+//             $x
+//         } else {
+//             y
+//         }
+//     }}
+// }
 
 pub fn mul_mat4_vec3<T: BaseFloat>(mat4: Matrix4<T>, vec3: Vector3<T>) -> Vector3<T>{
      Vector3::<T>::new(
@@ -167,6 +197,9 @@ impl WindowHandler {
                                 win.set_cursor_position(Position::from(PhysicalPosition::new(win.inner_size().width / 2, win.inner_size().height / 2))).unwrap();
                                 pitch -= delta.0 as f32 * sensitivity;
                                 yaw += delta.1 as f32 * sensitivity;
+
+                                yaw = min(max(yaw, Rad(FRAC_PI_8)),Rad(PI - FRAC_PI_8))
+
                                 let pitch_mat= Matrix4::<f32>::from_angle_y(Rad(pitch));
                                 let yaw_mat = Matrix4::<f32>::from_angle_x(Rad(yaw));
                                 let rotation: Matrix4<f32> = Matrix4::mul(pitch_mat, yaw_mat);
