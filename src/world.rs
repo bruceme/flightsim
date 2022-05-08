@@ -9,7 +9,6 @@ use cgmath::Vector3;
 pub struct World {
     gl: GlContext,
     objects: Vec<Entity>,
-    render_order: Vec<i32>,
     asset_manager: AssetManager,
 }
 
@@ -32,7 +31,6 @@ impl World {
         Self {
             gl: gl.clone(),
             objects,
-            render_order: Vec::new(),
             asset_manager,
         }
     }

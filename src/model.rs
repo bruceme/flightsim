@@ -1,8 +1,5 @@
 use cgmath::Matrix4;
-use glow::{
-    Context, HasContext, NativeBuffer, NativeProgram, NativeVertexArray, Texture, NO_ERROR,
-};
-use std::rc::Rc;
+use glow::{Context, HasContext, NativeProgram, NativeVertexArray, Texture};
 
 use crate::{helper::AsRawBytes, window_handler::GlContext};
 
@@ -130,12 +127,4 @@ impl Model {
 
 impl Drop for Model {
     fn drop(&mut self) {}
-}
-
-fn generic_slice_as_u8_slice<T: Copy>(slice: &[T]) -> &[u8] {
-    unsafe {
-        let len = slice.len() * std::mem::size_of::<T>();
-        let ptr = std::mem::transmute::<_, *mut u8>(slice.as_ptr());
-        std::slice::from_raw_parts_mut(ptr, len)
-    }
 }

@@ -70,14 +70,6 @@ macro_rules! max {
     }}
 }
 
-pub fn mul_mat4_vec3<T: BaseFloat>(mat4: Matrix4<T>, vec3: Vector3<T>) -> Vector3<T> {
-    Vector3::<T>::new(
-        mat4.x.x * vec3.x + mat4.y.x * vec3.y + mat4.z.x * vec3.z + mat4.w.x,
-        mat4.x.y * vec3.x + mat4.y.y * vec3.y + mat4.z.y * vec3.z + mat4.w.y,
-        mat4.x.z * vec3.x + mat4.y.z * vec3.y + mat4.z.z * vec3.z + mat4.w.z,
-    )
-}
-
 impl WindowHandler {
     pub fn new(width: i32, height: i32, vsync: bool) -> Self {
         let event_loop = glutin::event_loop::EventLoop::new();
@@ -226,12 +218,10 @@ impl WindowHandler {
                             window.resize(**new_inner_size);
                         }
                         WindowEvent::Resized(size) => unsafe {
-                            perspective_struct = PerspectiveFov::<f32> {
-                                fovy: Rad(90.0),
-                                aspect: size.width as f32 / size.height as f32,
-                                near: 0.1,
-                                far: 30.0,
-                            };
+                            perspective_struct.fovy = Rad(FRAC_PI_2);
+                            perspective_struct.aspect = size.width as f32 / size.height as f32;
+                            perspective_struct.near = 0.1;
+                            perspective_struct.far = 30.0;
 
                             perspective = Matrix4::from(perspective_struct.to_perspective());
                             gl.viewport(0, 0, size.width as i32, size.height as i32);
