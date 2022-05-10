@@ -69,18 +69,24 @@ impl Model{
 
 
     pub fn render(&self, gl: &Context, matrix: Matrix4<f32>, time: &f32, cam_per: &[f32; 16]) {
-        let m: [f32; 16] = *matrix.as_ref();
+        let transformation: [f32; 16] = *matrix.as_ref();
         unsafe{
             gl.bind_vertex_array(Some(self.vao));
             gl.use_program(Some(self.program));
             for (i, texture) in self.textures.iter().enumerate(){
                 gl.active_texture(glow::TEXTURE0 + i as u32);
-                gl.bind_texture(glow::TEXTURE0 + i as u32, Some(*texture));
+                gl.bind_texture(glow::TEXTURE_2D, Some(*texture));
                 gl.uniform_1_i32(gl.get_uniform_location(self.program, &format!("texture{}", i)).as_ref(), i as i32);
             }
             gl.uniform_1_f32(gl.get_uniform_location(self.program, "time").as_ref(), *time);
+            gl.uniform_matrix_4_f32_slice(gl.get_uniform_location(self.program, "transformation").as_ref(), false,&transformation);
             gl.uniform_matrix_4_f32_slice(gl.get_uniform_location(self.program, "view").as_ref(), false,  cam_per);
-            gl.draw_elements(glow::TRIANGLES, self.indices.len() as i32, glow::UNSIGNED_INT, 0);   
+            gl.draw_elements(glow::TRIANGLES, self.indices.len() as i32, glow::UNSIGNED_INT, 0);
+
+            for (i, _) in self.textures.iter().enumerate(){
+                gl.active_texture(glow::TEXTURE0 + i as u32);
+                gl.bind_texture(glow::TEXTURE_2D, None);
+            }
         }
     }
 }

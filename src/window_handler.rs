@@ -126,7 +126,7 @@ impl WindowHandler {
                 fovy: Rad(90.0),
                 aspect: window.window().inner_size().width as f32 / window.window().inner_size().height as f32,
                 near: 0.1,
-                far: 30.0,
+                far: 10000.0,
             };
 
             let mut perspective = Matrix4::from(perspective_struct.to_perspective());
@@ -203,7 +203,7 @@ impl WindowHandler {
                                 let pitch_mat= Matrix4::<f32>::from_angle_x(Rad(pitch));
                                 let yaw_mat = Matrix4::<f32>::from_angle_y(Rad(yaw));
 
-                                let rotation: Matrix4<f32> = Matrix4::mul(pitch_mat, yaw_mat);
+                                let rotation: Matrix4<f32> = Matrix4::mul(yaw_mat, pitch_mat);
                                 camera.direction = mul_mat4_vec3(rotation, Vector3::new(0.0, 0.0, -1.0));
                                 
                                 view = Matrix4::look_to_rh(camera.eye, camera.direction, camera.up);
@@ -228,7 +228,7 @@ impl WindowHandler {
                                 fovy: Rad(90.0),
                                 aspect: size.width as f32 / size.height as f32,
                                 near: 0.1,
-                                far: 30.0,
+                                far: 10000.0,
                             };
                     
                             perspective = Matrix4::from(perspective_struct.to_perspective());

@@ -1,5 +1,6 @@
 use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
 use glow::{Context, HasContext, NativeProgram, Texture};
+use image::ImageBuffer;
 use obj::{TexturedVertex, load_obj};
 
 use crate::{model::Model, window_handler::GlContext, helper::gl_get_error};
@@ -98,6 +99,19 @@ impl AssetManager{
 
         Model::new(&gl.clone(), vert, tex, norm, model.indices, self.load_shaders(gl.clone(), vert_shader, frag_shader), textures)
     }
-
     
+    pub fn load_obj_preloaded(&self, gl: &GlContext, object: (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>), vert_shader: &'static str, frag_shader: &'static str, texture_files: &[&str]) -> Model{
+
+        let (vert, tex, norm, ind) = object;
+        let textures = self.load_textures(gl,&texture_files);
+        Model::new(&gl.clone(), vert, tex, norm, ind, self.load_shaders(gl.clone(), vert_shader, frag_shader), textures)
+    }
+
+
+    pub fn load_image_rgba(file: &str) -> Vec<u8> {
+        //(**&(load_image::load_texture(file).expect("Image not found").as_raw()).as_chunks::<4>().0).into()
+        load_image::load_texture(file).expect("Image not found").into_raw()
+    }
 }
+
+// Equivalence of ripping out ram from a running computer
