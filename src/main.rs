@@ -9,6 +9,7 @@ mod helper;
 mod input_handler;
 mod mesh_factory;
 mod model;
+mod plane;
 mod window_handler;
 mod world;
 

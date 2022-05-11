@@ -9,13 +9,12 @@ use self::load_image::load_texture;
 mod load_image;
 
 pub struct AssetManager {
-    loaded_shaders: HashMap<String, NativeProgram>,
+    
 }
 
 impl AssetManager {
     pub fn new() -> Self {
         Self {
-            loaded_shaders: HashMap::new(),
         }
     }
 
@@ -25,9 +24,6 @@ impl AssetManager {
         vert_name: &'static str,
         frag_name: &'static str,
     ) -> NativeProgram {
-        if let Some(index) = self.loaded_shaders.get(vert_name) {
-            return *index;
-        }
 
         let program = unsafe { gl.create_program().expect("Cannot create program") };
 
@@ -127,7 +123,7 @@ impl AssetManager {
 
         for vertex in model.vertices.into_iter() {
             vert.push(vertex.position);
-            tex.push(vertex.texture[0..2].try_into().unwrap());
+            tex.push([vertex.texture[0], vertex.texture[1]]);
             norm.push(vertex.normal);
         }
 
@@ -143,17 +139,32 @@ impl AssetManager {
             textures,
         )
     }
-    
-    pub fn load_obj_preloaded(&self, gl: &GlContext, object: (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>), vert_shader: &'static str, frag_shader: &'static str, texture_files: &[&str]) -> Model{
 
+    pub fn load_obj_preloaded(
+        &self,
+        gl: &GlContext,
+        object: (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>),
+        vert_shader: &'static str,
+        frag_shader: &'static str,
+        texture_files: &[&str],
+    ) -> Model {
         let (vert, tex, norm, ind) = object;
-        let textures = self.load_textures(gl,&texture_files);
-        Model::new(&gl.clone(), vert, tex, norm, ind, self.load_shaders(gl.clone(), vert_shader, frag_shader), textures)
+        let textures = self.load_textures(gl, &texture_files);
+        Model::new(
+            &gl.clone(),
+            vert,
+            tex,
+            norm,
+            ind,
+            self.load_shaders(gl.clone(), vert_shader, frag_shader),
+            textures,
+        )
     }
-
 
     pub fn load_image_rgba(file: &str) -> Vec<u8> {
         //(**&(load_image::load_texture(file).expect("Image not found").as_raw()).as_chunks::<4>().0).into()
-        load_image::load_texture(file).expect("Image not found").into_raw()
+        load_image::load_texture(file)
+            .expect("Image not found")
+            .into_raw()
     }
 }

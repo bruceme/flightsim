@@ -11,6 +11,7 @@ use glutin::event_loop::ControlFlow;
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
 use std::cmp::{max, min};
 
+use crate::helper::gl_get_error;
 use crate::input_handler::{self, InputHandler};
 use crate::world::World;
 #[derive(Clone, Debug)]
@@ -107,6 +108,7 @@ impl WindowHandler {
             let world = World::new(&gl);
             let mut input_handler = InputHandler::new();
             unsafe {
+                gl.enable(glow::DEPTH_TEST);
                 gl.clear_color(0.0, 0.0, 0.0, 1.0);
             }
 
@@ -158,9 +160,10 @@ impl WindowHandler {
                         if tick_timer < update_timer.elapsed().as_nanos() {
                             tick_timer += second;
                             println!("Updates: {} Renders: {}", updates, renders);
-                            println!("{:#?}", input_handler.get_key_state());
+                            //println!("{:#?}", input_handler.get_key_state());
                             updates = 0;
                             renders = 0;
+                            //gl_get_error(&gl);
                         }
                         window.window().request_redraw();
                     }
