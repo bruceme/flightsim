@@ -29,7 +29,6 @@ impl Entity {
         }
     }
 
-<<<<<<< HEAD
     pub fn new_obj(gl: &GlContext, asset_manager: &AssetManager, object: (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>), vert_shader: &'static str, frag_shader: &'static str, texture_files: &[&str], position: Vector3<f32>)-> Self{
         Self{
             position,
@@ -38,9 +37,8 @@ impl Entity {
     }
 
     pub fn update(&self, key_state: &KeyState){
-=======
-    pub fn update(&self, key_state: &KeyState) {}
->>>>>>> 928e71403e5375d67113a0104c37baff017bbb85
+    
+    }
 
     pub fn render(&self, gl: &GlContext, time: &f32, cam_per: &[f32; 16]) {
         let matrix = Matrix4::from_translation(self.position);

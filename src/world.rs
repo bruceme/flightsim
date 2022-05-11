@@ -2,9 +2,10 @@ use crate::{
     asset_manager::{self, AssetManager},
     entity::Entity,
     input_handler::KeyState,
-    window_handler::GlContext,
+    window_handler::GlContext, mesh_factory::MeshFactory,
 };
 use cgmath::Vector3;
+use glow::HasContext;
 
 pub struct World {
     gl: GlContext,
