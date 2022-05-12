@@ -1,9 +1,8 @@
 use crate::{
-    asset_manager::{self, AssetManager},
+    asset_manager::{AssetManager},
     entity::Entity,
     input_handler::KeyState,
     mesh_factory::MeshFactory,
-    model::Model,
     plane::Plane,
     window_handler::GlContext,
 };
@@ -77,7 +76,7 @@ impl World {
         self.plane.update(key_state);
     }
 
-    pub fn render(&self, time: &f32, cam_per: &[f32; 16]) -> () {
+    pub fn render(&mut self, time: &f32, cam_per: &[f32; 16]) -> () {
         self.skybox.render(&self.gl, time, cam_per);
         unsafe {
             self.gl.clear(glow::DEPTH_BUFFER_BIT);

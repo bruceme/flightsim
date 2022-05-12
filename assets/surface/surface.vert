@@ -8,6 +8,7 @@ in vec2 texies;
 out vec2 frag_texies;
 out vec3 frag_normals;
 
+uniform float time;
 uniform mat4 view;
 uniform mat4 transformation;
 

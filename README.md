@@ -18,7 +18,7 @@
 | Plane animations      | ❌      |
 | Skybox                | ❌      |
 
-### Might be implemented:
+### Might be implemented
 
 | Feature                                 | Status |
 | --------------------------------------- | ------ |
@@ -35,3 +35,7 @@
 | Clouds                                  | ❌      |
 | Basic UI showing speed                  | ❌      |
 | Menu with plane selection               | ❌      |
+
+## Resources
+
+[Plane](https://sketchfab.com/3d-models/low-poly-plane-76230052903540e9aeb46b7db35329e4)

@@ -105,7 +105,7 @@ impl WindowHandler {
         } = self;
 
         {
-            let world = World::new(&gl);
+            let mut world = World::new(&gl);
             let mut input_handler = InputHandler::new();
             unsafe {
                 gl.enable(glow::DEPTH_TEST);
@@ -173,13 +173,13 @@ impl WindowHandler {
                         }
 
                         let cam_per: [f32; 16] = *perspective.mul(view).as_ref();
-
+                        let now = Instant::now();
                         world.render(
-                            &update_timer.duration_since(last_update).as_secs_f32(),
+                            &now.duration_since(last_update).as_secs_f32(),
                             &cam_per,
                         );
                         window.swap_buffers().unwrap();
-                        last_update = update_timer;
+                        last_update = now;
                         renders += 1;
                     }
                     Event::DeviceEvent { ref event, .. } => match event {
