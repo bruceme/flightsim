@@ -217,7 +217,7 @@ impl WindowHandler {
                             perspective_struct.fovy = Rad(FRAC_PI_2);
                             perspective_struct.aspect = size.width as f32 / size.height as f32;
                             perspective_struct.near = 0.1;
-                            perspective_struct.far = 10000.0;
+                            perspective_struct.far = 100000.0;
 
                             camera.perspective = Matrix4::from(perspective_struct.to_perspective());
                             gl.viewport(0, 0, size.width as i32, size.height as i32);
