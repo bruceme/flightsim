@@ -90,8 +90,10 @@ impl Plane {
         if key_state.accelerate {
             self.speed += 0.005;
         }
-
         self.speed = self.speed.clamp(0.5, 1.5);
+        if key_state.turbo {
+            self.speed = 50.0;
+        }
 
         self.position += self.forward * self.speed;
     }

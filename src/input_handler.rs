@@ -12,6 +12,7 @@ pub struct KeyState {
     pub right: bool,
     pub accelerate: bool,
     pub escape: bool,
+    pub turbo: bool,
 }
 
 impl InputHandler {
@@ -24,6 +25,7 @@ impl InputHandler {
                 right: false,
                 accelerate: false,
                 escape: false,
+                turbo: false,
             },
         }
     }
@@ -50,6 +52,10 @@ impl InputHandler {
                     if input.state == ElementState::Released {
                         self.key_state.escape = !self.key_state.escape;
                     }
+                }
+
+                VirtualKeyCode::T => {
+                    self.key_state.turbo = input.state == ElementState::Pressed;
                 }
                 _ => (),
             }

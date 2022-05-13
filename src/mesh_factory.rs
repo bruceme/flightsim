@@ -39,20 +39,16 @@ impl MeshFactory {
                 let index = (x + y * image_width as i32) as usize;
 
                 let vertex: Vector3<f32> = vertices[index].into();
-                let up: Vector3<f32> = vertices[(x
-                    + (y + 1).clamp(0, (image_height - 1) as i32) * image_width as i32)
+                let up: Vector3<f32> = vertices[(x + (y + 1).clamp(0, (image_height - 1) as i32) * image_width as i32)
                     as usize]
                     .into();
-                let down: Vector3<f32> = vertices[(x
-                    + (y - 1).clamp(0, (image_height - 1) as i32) * image_width as i32)
+                let down: Vector3<f32> = vertices[(x + (y - 1).clamp(0, (image_height - 1) as i32) * image_width as i32)
                     as usize]
                     .into();
-                let left: Vector3<f32> = vertices[((y - 1).clamp(0, (image_height - 1) as i32)
-                    + y * image_width as i32)
+                let left: Vector3<f32> = vertices[((x - 1).clamp(0, (image_width - 1) as i32) + y * image_width as i32)
                     as usize]
                     .into();
-                let right: Vector3<f32> = vertices[((y + 1).clamp(0, (image_height - 1) as i32)
-                    + y * image_width as i32)
+                let right: Vector3<f32> = vertices[((x + 1).clamp(0, (image_width - 1) as i32) + y * image_width as i32)
                     as usize]
                     .into();
 
