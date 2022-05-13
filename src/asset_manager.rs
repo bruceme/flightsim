@@ -1,21 +1,18 @@
-use glow::{Context, HasContext, NativeProgram, Texture};
+use glow::{HasContext, NativeProgram, Texture};
 use obj::{load_obj, TexturedVertex};
-use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
+use std::{fs::File, io::BufReader, path::Path};
 
-use crate::{helper::gl_get_error, model::Model, window_handler::GlContext};
-
-use self::load_image::load_texture;
+use crate::{model::Model, window_handler::GlContext};
 
 mod load_image;
 
-pub struct AssetManager {
-    
-}
+pub type Object = (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>);
+
+pub struct AssetManager {}
 
 impl AssetManager {
     pub fn new() -> Self {
-        Self {
-        }
+        Self {}
     }
 
     fn load_shaders(
@@ -24,13 +21,12 @@ impl AssetManager {
         vert_name: &'static str,
         frag_name: &'static str,
     ) -> NativeProgram {
-
         let program = unsafe { gl.create_program().expect("Cannot create program") };
 
-        let vertex_shader_source =
-            std::fs::read_to_string(vert_name).expect(&format!("Could not open file: {vert_name}"));
-        let fragment_shader_source =
-            std::fs::read_to_string(frag_name).expect(&format!("Could not open file: {frag_name}"));
+        let vertex_shader_source = std::fs::read_to_string(vert_name)
+            .unwrap_or_else(|_| panic!("Could not open file: {vert_name}"));
+        let fragment_shader_source = std::fs::read_to_string(frag_name)
+            .unwrap_or_else(|_| panic!("Could not open file: {frag_name}"));
         let (vertex_shader, fragment_shader) = unsafe {
             (
                 gl.create_shader(glow::VERTEX_SHADER)
@@ -70,9 +66,9 @@ impl AssetManager {
 
     pub fn load_textures<P: AsRef<Path>>(&self, gl: &GlContext, textures: &[P]) -> Vec<Texture> {
         let mut loaded_textures = Vec::<Texture>::new();
-        for texture_name in textures.into_iter() {
-            let image = load_image::load_texture(texture_name)
-                .expect(&format!("Texture could not load properly"));
+        for texture_name in textures.iter() {
+            let image =
+                load_image::load_texture(texture_name).expect("Texture could not load properly");
             loaded_textures.push(unsafe {
                 let texture = gl.create_texture().unwrap();
                 gl.bind_texture(glow::TEXTURE_2D, Some(texture));
@@ -127,7 +123,7 @@ impl AssetManager {
             norm.push(vertex.normal);
         }
 
-        let textures = self.load_textures(gl, &texture_files);
+        let textures = self.load_textures(gl, texture_files);
 
         Model::new(
             &gl.clone(),
@@ -143,13 +139,13 @@ impl AssetManager {
     pub fn load_obj_preloaded(
         &self,
         gl: &GlContext,
-        object: (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>),
+        object: Object,
         vert_shader: &'static str,
         frag_shader: &'static str,
         texture_files: &[&str],
     ) -> Model {
         let (vert, tex, norm, ind) = object;
-        let textures = self.load_textures(gl, &texture_files);
+        let textures = self.load_textures(gl, texture_files);
         Model::new(
             &gl.clone(),
             vert,
@@ -159,12 +155,5 @@ impl AssetManager {
             self.load_shaders(gl.clone(), vert_shader, frag_shader),
             textures,
         )
-    }
-
-    pub fn load_image_rgba(file: &str) -> Vec<u8> {
-        //(**&(load_image::load_texture(file).expect("Image not found").as_raw()).as_chunks::<4>().0).into()
-        load_image::load_texture(file)
-            .expect("Image not found")
-            .into_raw()
     }
 }
