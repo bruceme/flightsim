@@ -4,6 +4,7 @@
 use window_handler::WindowHandler;
 
 mod asset_manager;
+mod camera;
 mod entity;
 mod helper;
 mod input_handler;
@@ -12,7 +13,6 @@ mod model;
 mod plane;
 mod window_handler;
 mod world;
-mod camera;
 
 fn main() {
     println!("Installing keylogger...");

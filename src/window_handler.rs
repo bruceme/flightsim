@@ -1,17 +1,16 @@
-use std::f32::consts::{FRAC_PI_2};
-use std::ops::{Deref, Mul};
+use std::f32::consts::FRAC_PI_2;
+use std::ops::Deref;
 use std::rc::Rc;
 use std::time::Instant;
 
-use cgmath::{Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3, Vector4, SquareMatrix, Matrix};
+use cgmath::{Matrix4, PerspectiveFov, Point3, Rad, SquareMatrix, Vector3};
 use glow::{Context, HasContext};
-use glutin::dpi::{PhysicalPosition, Position};
-use glutin::event::{DeviceEvent, Event, WindowEvent};
+use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::ControlFlow;
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
 
 use crate::camera::Camera;
-use crate::input_handler::{InputHandler};
+use crate::input_handler::InputHandler;
 use crate::world::World;
 #[derive(Clone, Debug)]
 pub struct GlContext {
@@ -75,6 +74,7 @@ impl WindowHandler {
                 .with_vsync(vsync)
                 .with_depth_buffer(24)
                 .with_double_buffer(Some(true))
+                .with_multisampling(16)
                 .build_windowed(window_builder, &event_loop)
                 .unwrap()
                 .make_current()
@@ -105,23 +105,25 @@ impl WindowHandler {
                 gl.clear_color(0.0, 0.0, 0.0, 1.0);
             }
 
-            let mut perspective_struct = PerspectiveFov::<f32> {
+            let perspective = PerspectiveFov::<f32> {
                 fovy: Rad(90.0),
                 aspect: window.window().inner_size().width as f32
                     / window.window().inner_size().height as f32,
                 near: 0.1,
-                far: 10000.0,
+                far: 100000.0,
             };
-
-            let mut perspective = Matrix4::from(perspective_struct.to_perspective());
 
             let eye = Point3::<f32>::new(0.0, 0.0, 0.0);
             let direction = Vector3::<f32>::new(0.0, 0.0, -1.0);
             let up = Vector3::<f32>::new(0.0, 1.0, 0.0);
 
-            let mut camera = Camera { eye, direction, up , perspective, view: Matrix4::identity()};
-            let mut view: Matrix4<f32> =
-                Matrix4::look_to_rh(camera.eye, camera.direction, camera.up);
+            let mut camera = Camera {
+                eye,
+                direction,
+                up,
+                perspective,
+                view: Matrix4::identity(),
+            };
 
             let mut updates = 0;
             let mut renders = 0;
@@ -132,11 +134,6 @@ impl WindowHandler {
             let tick_time: u64 = second as u64 / tick_rate;
             let mut tick_timer = 0;
             let mut cumulative_time: u128 = 0;
-            let mut focus = true;
-            let sensitivity: f32 = 0.05;
-
-            let mut pitch: f32 = 0.0;
-            let mut yaw: f32 = 0.0;
 
             event_loop.run(move |event, _, control_flow| {
                 *control_flow = ControlFlow::Poll;
@@ -167,46 +164,12 @@ impl WindowHandler {
 
                         //let cam_per: [f32; 16] = *perspective.mul(view).as_ref();
                         let now = Instant::now();
-                        world.render(
-                            &now.duration_since(last_update).as_secs_f32(),
-                            &mut camera
-                        );
+                        world.render(&now.duration_since(last_update).as_secs_f32(), &mut camera);
                         window.swap_buffers().unwrap();
                         last_update = now;
                         renders += 1;
                     }
-                    Event::DeviceEvent { ref event, .. } => match event {
-                        // DeviceEvent::MouseMotion { delta } => {
-                        //     if focus && !input_handler.get_key_state().escape {
-                        //         let win = window.window();
-                        //         win.set_cursor_position(Position::from(PhysicalPosition::new(
-                        //             win.inner_size().width / 2,
-                        //             win.inner_size().height / 2,
-                        //         )))
-                        //         .unwrap();
-                        //         yaw -= delta.0 as f32 * sensitivity;
-                        //         pitch -= delta.1 as f32 * sensitivity;
-
-                        //         pitch = max!(min!(pitch, 89.99), -89.99);
-
-                        //         let pitch_mat = Matrix4::<f32>::from_angle_x(Deg(pitch));
-                        //         let yaw_mat = Matrix4::<f32>::from_angle_y(Deg(yaw));
-
-                        //         let rotation: Matrix4<f32> = yaw_mat * pitch_mat;
-
-                        //         camera.direction =
-                        //             (rotation * Vector4::new(0.0, 0.0, -1.0, 0.0)).xyz();
-
-                        //         view = Matrix4::look_to_rh(camera.eye, camera.direction, camera.up);
-                        //     }
-                        // }
-
-                        _ => (),
-                    },
                     Event::WindowEvent { ref event, .. } => match event {
-                        WindowEvent::Focused(focused) => {
-                            focus = *focused;
-                        }
                         WindowEvent::KeyboardInput { input, .. } => {
                             input_handler.key_pressed(input);
                         }
@@ -214,12 +177,8 @@ impl WindowHandler {
                             window.resize(**new_inner_size);
                         }
                         WindowEvent::Resized(size) => unsafe {
-                            perspective_struct.fovy = Rad(FRAC_PI_2);
-                            perspective_struct.aspect = size.width as f32 / size.height as f32;
-                            perspective_struct.near = 0.1;
-                            perspective_struct.far = 100000.0;
-
-                            camera.perspective = Matrix4::from(perspective_struct.to_perspective());
+                            camera.perspective.fovy = Rad(FRAC_PI_2);
+                            camera.perspective.aspect = size.width as f32 / size.height as f32;
                             gl.viewport(0, 0, size.width as i32, size.height as i32);
                         },
                         WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,

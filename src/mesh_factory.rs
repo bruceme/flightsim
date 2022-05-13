@@ -1,15 +1,11 @@
-use cgmath::{InnerSpace, Vector2, Vector3};
+use cgmath::{InnerSpace, Vector3};
 
-use crate::window_handler::GlContext;
+use crate::asset_manager::Object;
 
 pub struct MeshFactory {}
 
 impl MeshFactory {
-    pub fn generate_surface(
-        heightmap: &str,
-        scale: f32,
-        height_exaggeration: f32,
-    ) -> (Vec<[f32; 3]>, Vec<[f32; 2]>, Vec<[f32; 3]>, Vec<u32>) {
+    pub fn generate_surface(heightmap: &str, scale: f32, height_exaggeration: f32) -> Object {
         let mut vertices: Vec<[f32; 3]> = Vec::new();
         let mut texies: Vec<[f32; 2]> = Vec::new();
         let mut normals: Vec<[f32; 3]> = Vec::new();

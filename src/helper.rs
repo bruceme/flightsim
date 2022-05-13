@@ -23,7 +23,7 @@ impl<T: Copy, const LEN: usize> AsRawBytes for [T; LEN] {
     }
 }
 
-fn generic_slice_as_u8_slice<'a, T: Copy>(slice: &'a [T]) -> &'a [u8] {
+fn generic_slice_as_u8_slice<T: Copy>(slice: &[T]) -> &[u8] {
     unsafe {
         let len = slice.len() * std::mem::size_of::<T>();
         let ptr = std::mem::transmute::<_, *mut u8>(slice.as_ptr());
@@ -31,6 +31,7 @@ fn generic_slice_as_u8_slice<'a, T: Copy>(slice: &'a [T]) -> &'a [u8] {
     }
 }
 
+#[allow(unused)]
 pub fn gl_get_error(gl: &GlContext) {
     unsafe {
         loop {
