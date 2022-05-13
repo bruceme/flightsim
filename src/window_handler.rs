@@ -3,7 +3,7 @@ use std::ops::{Deref, Mul};
 use std::rc::Rc;
 use std::time::Instant;
 
-use cgmath::{Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3, Vector4};
+use cgmath::{Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3, Vector4, SquareMatrix, Matrix};
 use glow::{Context, HasContext};
 use glutin::dpi::{PhysicalPosition, Position};
 use glutin::event::{DeviceEvent, Event, WindowEvent};
@@ -119,7 +119,7 @@ impl WindowHandler {
             let direction = Vector3::<f32>::new(0.0, 0.0, -1.0);
             let up = Vector3::<f32>::new(0.0, 1.0, 0.0);
 
-            let mut camera = Camera { eye, direction, up };
+            let mut camera = Camera { eye, direction, up , perspective, view: Matrix4::identity()};
             let mut view: Matrix4<f32> =
                 Matrix4::look_to_rh(camera.eye, camera.direction, camera.up);
 
@@ -165,11 +165,10 @@ impl WindowHandler {
                             gl.clear(glow::DEPTH_BUFFER_BIT | glow::COLOR_BUFFER_BIT);
                         }
 
-                        let cam_per: [f32; 16] = *perspective.mul(view).as_ref();
+                        //let cam_per: [f32; 16] = *perspective.mul(view).as_ref();
                         let now = Instant::now();
                         world.render(
                             &now.duration_since(last_update).as_secs_f32(),
-                            &cam_per,
                             &mut camera
                         );
                         window.swap_buffers().unwrap();
@@ -177,30 +176,30 @@ impl WindowHandler {
                         renders += 1;
                     }
                     Event::DeviceEvent { ref event, .. } => match event {
-                        DeviceEvent::MouseMotion { delta } => {
-                            if focus && !input_handler.get_key_state().escape {
-                                let win = window.window();
-                                win.set_cursor_position(Position::from(PhysicalPosition::new(
-                                    win.inner_size().width / 2,
-                                    win.inner_size().height / 2,
-                                )))
-                                .unwrap();
-                                yaw -= delta.0 as f32 * sensitivity;
-                                pitch -= delta.1 as f32 * sensitivity;
+                        // DeviceEvent::MouseMotion { delta } => {
+                        //     if focus && !input_handler.get_key_state().escape {
+                        //         let win = window.window();
+                        //         win.set_cursor_position(Position::from(PhysicalPosition::new(
+                        //             win.inner_size().width / 2,
+                        //             win.inner_size().height / 2,
+                        //         )))
+                        //         .unwrap();
+                        //         yaw -= delta.0 as f32 * sensitivity;
+                        //         pitch -= delta.1 as f32 * sensitivity;
 
-                                pitch = max!(min!(pitch, 89.99), -89.99);
+                        //         pitch = max!(min!(pitch, 89.99), -89.99);
 
-                                let pitch_mat = Matrix4::<f32>::from_angle_x(Deg(pitch));
-                                let yaw_mat = Matrix4::<f32>::from_angle_y(Deg(yaw));
+                        //         let pitch_mat = Matrix4::<f32>::from_angle_x(Deg(pitch));
+                        //         let yaw_mat = Matrix4::<f32>::from_angle_y(Deg(yaw));
 
-                                let rotation: Matrix4<f32> = yaw_mat * pitch_mat;
+                        //         let rotation: Matrix4<f32> = yaw_mat * pitch_mat;
 
-                                camera.direction =
-                                    (rotation * Vector4::new(0.0, 0.0, -1.0, 0.0)).xyz();
+                        //         camera.direction =
+                        //             (rotation * Vector4::new(0.0, 0.0, -1.0, 0.0)).xyz();
 
-                                view = Matrix4::look_to_rh(camera.eye, camera.direction, camera.up);
-                            }
-                        }
+                        //         view = Matrix4::look_to_rh(camera.eye, camera.direction, camera.up);
+                        //     }
+                        // }
 
                         _ => (),
                     },
@@ -220,7 +219,7 @@ impl WindowHandler {
                             perspective_struct.near = 0.1;
                             perspective_struct.far = 10000.0;
 
-                            perspective = Matrix4::from(perspective_struct.to_perspective());
+                            camera.perspective = Matrix4::from(perspective_struct.to_perspective());
                             gl.viewport(0, 0, size.width as i32, size.height as i32);
                         },
                         WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,

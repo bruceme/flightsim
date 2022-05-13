@@ -6,7 +6,7 @@ use crate::{
     plane::Plane,
     window_handler::GlContext, camera::Camera,
 };
-use cgmath::Vector3;
+use cgmath::{Vector3, Point3};
 use glow::HasContext;
 
 pub struct World {
@@ -34,7 +34,7 @@ impl World {
         let surface = Entity::new_obj(
             &gl,
             &asset_manager,
-            MeshFactory::generate_surface("assets/surface/surface.png", 0.1, 0.01),
+            MeshFactory::generate_surface("assets/surface/surface.png", 10.0, 1.0),
             "assets/surface/surface.vert",
             "assets/surface/surface.frag",
             &["assets/surface/surface.png"],
@@ -76,16 +76,19 @@ impl World {
         self.plane.update(key_state);
     }
 
-    pub fn render(&mut self, time: &f32, cam_per: &[f32; 16], camera: &mut Camera) -> () {
-        self.skybox.render(&self.gl, time, cam_per);
+    pub fn render(&mut self, time: &f32, camera: &mut Camera) -> () {
+        camera.eye = Point3::new(0.01, 0.0, 0.01);
+        camera.update_view();
+        self.skybox.render(&self.gl, time, &camera.to_view_matrix());
         unsafe {
             self.gl.clear(glow::DEPTH_BUFFER_BIT);
         }
+        self.plane.render(&self.gl, time, camera);
 
         self.objects
             .iter()
-            .for_each(|object| object.render(&self.gl, time, cam_per));
+            .for_each(|object| object.render(&self.gl, time, &camera.to_view_matrix()));
         
-        self.plane.render(&self.gl, time, cam_per, camera);
+        
     }
 }

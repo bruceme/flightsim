@@ -1,6 +1,6 @@
 use std::convert::identity;
 
-use cgmath::{Matrix4, Vector2, Vector3, SquareMatrix, Rad, Deg, Vector4, InnerSpace, Matrix3};
+use cgmath::{Matrix4, Vector2, Vector3, SquareMatrix, Rad, Deg, Vector4, InnerSpace, Point3, EuclideanSpace};
 
 use crate::{input_handler::KeyState, model::Model, window_handler::GlContext, camera::Camera};
 
@@ -25,8 +25,8 @@ pub struct Plane {
 }
 
 impl Plane {
-    pub const PITCH_SPEED: f32 = 0.01;
-    pub const ROLL_SPEED: f32 = 0.01;
+    pub const PITCH_SPEED: f32 = 0.005;
+    pub const ROLL_SPEED: f32 = 0.005;
 
     pub fn new(body: Model, propeller: Model, position: Vector3<f32>) -> Self {
         Self {
@@ -44,7 +44,7 @@ impl Plane {
             acceleration: 0.05,
 
             propeller_rotation: 0.0,
-            camera_offset: Vector3::new(0.0, 1.0, -2.0),
+            camera_offset: Vector3::new(0.0, 3.0, -15.0),
         }
     }
 
@@ -63,11 +63,11 @@ impl Plane {
 
         //pitch
         if key_state.up {
-            self.pitch(Self::PITCH_SPEED);
+            self.pitch(-Self::PITCH_SPEED);
         }
 
         if key_state.down {
-            self.pitch(-Self::PITCH_SPEED);
+            self.pitch(Self::PITCH_SPEED);
         }
 
         if key_state.left {
@@ -87,8 +87,7 @@ impl Plane {
         self.position += self.forward * self.speed;
     }
 
-    pub fn render(&mut self, gl: &GlContext, time: &f32, cam_per: &[f32; 16], camera: &mut Camera) -> () {
-        let mut matrix = Matrix4::identity();
+    pub fn render(&mut self, gl: &GlContext, time: &f32, camera: &mut Camera) -> () {
         let translation = Matrix4::from_translation(self.position);
 
         let right = self.right;
@@ -102,8 +101,13 @@ impl Plane {
             0.0, 0.0, 0.0, 1.0,
         );
         
-        matrix = translation * plane_rot * matrix;
-        self.body.render(gl, matrix, time, cam_per);
+        let mut matrix = translation * plane_rot;
+        let camera_position = (matrix * Matrix4::from_translation(self.camera_offset) * Vector4::<f32>::new(0.0, 0.0, 0.0, 1.0)).xyz();
+        camera.eye = Point3::from_vec(camera_position);
+        camera.direction = self.forward;//((Matrix4::from_translation(Vector3::new(0.0, 0.0, 1.0)) * matrix * Vector4::<f32>::new(0.0, 0.0, 0.0, 1.0)).xyz() - camera_position).normalize();
+        camera.up = self.up;
+        camera.update_view();
+        self.body.render(gl, matrix, time, &camera.to_view_matrix());
 
         let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
         let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
@@ -111,10 +115,10 @@ impl Plane {
 
         let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
 
-        //camera.eye = Vector4::new(0.0, 0.0, 0.0, 1.0).xyz().into();
+        
         let spin = offset * rotation * rev_offset;
         matrix = translation * plane_rot * spin;
 
-        self.propeller.render(gl, matrix, time, cam_per);
+        self.propeller.render(gl, matrix, time, &camera.to_view_matrix());
     }
 }
