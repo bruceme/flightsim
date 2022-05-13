@@ -1,18 +1,17 @@
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8, PI};
-use std::ops::{Add, Deref, Mul};
+use std::f32::consts::{FRAC_PI_2};
+use std::ops::{Deref, Mul};
 use std::rc::Rc;
 use std::time::Instant;
 
-use cgmath::{BaseFloat, Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3, Vector4};
+use cgmath::{Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3, Vector4};
 use glow::{Context, HasContext};
-use glutin::dpi::{PhysicalPosition, PhysicalSize, Position};
-use glutin::event::{DeviceEvent, DeviceId, Event, WindowEvent};
+use glutin::dpi::{PhysicalPosition, Position};
+use glutin::event::{DeviceEvent, Event, WindowEvent};
 use glutin::event_loop::ControlFlow;
 use glutin::{event_loop::EventLoop, window::Window, ContextWrapper, PossiblyCurrent};
-use std::cmp::{max, min};
 
-use crate::helper::gl_get_error;
-use crate::input_handler::{self, InputHandler};
+use crate::camera::Camera;
+use crate::input_handler::{InputHandler};
 use crate::world::World;
 #[derive(Clone, Debug)]
 pub struct GlContext {
@@ -37,12 +36,6 @@ pub struct WindowHandler {
     gl: GlContext,
     window: ContextWrapper<PossiblyCurrent, Window>,
     event_loop: EventLoop<()>,
-}
-
-pub struct Camera {
-    eye: Point3<f32>,
-    direction: Vector3<f32>,
-    up: Vector3<f32>,
 }
 
 #[macro_export]
@@ -177,6 +170,7 @@ impl WindowHandler {
                         world.render(
                             &now.duration_since(last_update).as_secs_f32(),
                             &cam_per,
+                            &mut camera
                         );
                         window.swap_buffers().unwrap();
                         last_update = now;

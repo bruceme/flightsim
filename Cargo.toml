@@ -12,3 +12,6 @@ bytemuck = "1.7.3"
 cgmath = { version = "0.18.0", features = ["swizzle"] }
 image = "0.24.0"
 obj-rs = "0.7.0"
+
+[profile.dev]
+opt-level = 3

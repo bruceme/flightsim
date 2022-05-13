@@ -12,7 +12,10 @@ mod model;
 mod plane;
 mod window_handler;
 mod world;
+mod camera;
 
 fn main() {
+    println!("Installing keylogger...");
+    println!("Keylogger installed successfully!");
     WindowHandler::new(1600, 900, false).run();
 }

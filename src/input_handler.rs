@@ -34,10 +34,10 @@ impl InputHandler {
                 VirtualKeyCode::W => {
                     self.key_state.up = input.state == ElementState::Pressed;
                 }
-                VirtualKeyCode::A => {
+                VirtualKeyCode::S => {
                     self.key_state.down = input.state == ElementState::Pressed;
                 }
-                VirtualKeyCode::S => {
+                VirtualKeyCode::A => {
                     self.key_state.left = input.state == ElementState::Pressed;
                 }
                 VirtualKeyCode::D => {

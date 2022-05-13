@@ -4,7 +4,7 @@ use crate::{
     input_handler::KeyState,
     mesh_factory::MeshFactory,
     plane::Plane,
-    window_handler::GlContext,
+    window_handler::GlContext, camera::Camera,
 };
 use cgmath::Vector3;
 use glow::HasContext;
@@ -69,25 +69,23 @@ impl World {
         }
     }
 
-    pub fn update(&self, key_state: &KeyState) -> () {
+    pub fn update(&mut self, key_state: &KeyState) -> () {
         self.objects
             .iter()
             .for_each(|object| object.update(key_state));
         self.plane.update(key_state);
     }
 
-    pub fn render(&mut self, time: &f32, cam_per: &[f32; 16]) -> () {
+    pub fn render(&mut self, time: &f32, cam_per: &[f32; 16], camera: &mut Camera) -> () {
         self.skybox.render(&self.gl, time, cam_per);
         unsafe {
             self.gl.clear(glow::DEPTH_BUFFER_BIT);
         }
 
-        
-
         self.objects
             .iter()
             .for_each(|object| object.render(&self.gl, time, cam_per));
         
-        self.plane.render(&self.gl, time, cam_per);
+        self.plane.render(&self.gl, time, cam_per, camera);
     }
 }
