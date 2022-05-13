@@ -8,6 +8,7 @@ pub struct Plane {
     body: Model,
     propeller: Model,
     
+    scale: f32,
     position: Vector3<f32>,
 
     max_speed: f32,
@@ -32,6 +33,8 @@ impl Plane {
         Self {
             body,
             propeller,
+
+            scale: 0.25,
             position,
 
             max_speed: 1.5,
@@ -100,8 +103,9 @@ impl Plane {
             forward.x, forward.y, forward.z,0.0,
             0.0, 0.0, 0.0, 1.0,
         );
-        
-        let mut matrix = translation * plane_rot;
+
+        let scale_matrix = Matrix4::from_scale(self.scale);
+        let mut matrix = translation * plane_rot * scale_matrix;
         let camera_position = (matrix * Matrix4::from_translation(self.camera_offset) * Vector4::<f32>::new(0.0, 0.0, 0.0, 1.0)).xyz();
         camera.eye = Point3::from_vec(camera_position);
         camera.direction = self.forward;//((Matrix4::from_translation(Vector3::new(0.0, 0.0, 1.0)) * matrix * Vector4::<f32>::new(0.0, 0.0, 0.0, 1.0)).xyz() - camera_position).normalize();
@@ -117,7 +121,7 @@ impl Plane {
 
         
         let spin = offset * rotation * rev_offset;
-        matrix = translation * plane_rot * spin;
+        matrix = matrix * spin;
 
         self.propeller.render(gl, matrix, time, &camera.to_view_matrix());
     }

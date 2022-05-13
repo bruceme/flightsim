@@ -34,11 +34,11 @@ impl World {
         let surface = Entity::new_obj(
             &gl,
             &asset_manager,
-            MeshFactory::generate_surface("assets/surface/surface.png", 10.0, 1.0),
+            MeshFactory::generate_surface("assets/surface/surface.png", 100.0, 20.0),
             "assets/surface/surface.vert",
             "assets/surface/surface.frag",
             &["assets/surface/surface.png"],
-            Vector3::new(-20.0, -5.0, -20.0),
+            Vector3::new(-20000.0, -3000.0, -20000.0),
         );
         objects.push(surface);
 
