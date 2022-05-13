@@ -9,12 +9,13 @@ pub struct Plane {
     propeller: Model,
     
     position: Vector3<f32>,
-
-    max_speed: f32,
     
     forward: Vector3::<f32>,
     up: Vector3::<f32>,
     right: Vector3::<f32>,
+
+    pitch_velocity: f32,
+    roll_velocity: f32,
 
     speed: f32,
     acceleration: f32,
@@ -25,20 +26,21 @@ pub struct Plane {
 }
 
 impl Plane {
-    pub const PITCH_SPEED: f32 = 0.005;
-    pub const ROLL_SPEED: f32 = 0.005;
+    pub const PITCH_SPEED: f32 = 0.00005;
+    pub const ROLL_SPEED: f32 = 0.0001;
 
     pub fn new(body: Model, propeller: Model, position: Vector3<f32>) -> Self {
         Self {
             body,
             propeller,
             position,
-
-            max_speed: 1.5,
             
             forward: Vector3::new(0.0, 0.0, -1.0),
             up: Vector3::new(0.0, 1.0, 0.0),
             right: Vector3::new(1.0, 0.0, 0.0),
+
+            pitch_velocity: 0.0,
+            roll_velocity: 0.0,
             
             speed: 0.1,
             acceleration: 0.05,
@@ -63,26 +65,30 @@ impl Plane {
 
         //pitch
         if key_state.up {
-            self.pitch(-Self::PITCH_SPEED);
+            self.pitch_velocity -= Self::PITCH_SPEED;
         }
 
         if key_state.down {
-            self.pitch(Self::PITCH_SPEED);
+            self.pitch_velocity += Self::PITCH_SPEED;
         }
 
         if key_state.left {
-            self.roll(Self::ROLL_SPEED);
+            self.roll_velocity += Self::ROLL_SPEED;
         }
 
         if key_state.right {
-            self.roll(-Self::ROLL_SPEED);
+            self.roll_velocity -= Self::ROLL_SPEED;
         }
+
+        self.pitch(self.pitch_velocity);
+        self.roll(self.roll_velocity);
+
         self.speed -= 0.001;
-        if key_state.accelerate{
+        if key_state.accelerate {
             self.speed += 0.005;
         }
 
-        self.speed = self.speed.clamp(0.0, self.max_speed);
+        self.speed = self.speed.clamp(0.5, 1.5);
 
         self.position += self.forward * self.speed;
     }
