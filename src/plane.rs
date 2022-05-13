@@ -1,6 +1,6 @@
 use std::convert::identity;
 
-use cgmath::{Matrix4, Vector2, Vector3, SquareMatrix, Rad, Deg, Vector4, InnerSpace};
+use cgmath::{Matrix4, Vector2, Vector3, SquareMatrix, Rad, Deg, Vector4, InnerSpace, Matrix3};
 
 use crate::{input_handler::KeyState, model::Model, window_handler::GlContext, camera::Camera};
 
@@ -10,17 +10,11 @@ pub struct Plane {
     
     position: Vector3<f32>,
 
-    pitch: f32,
-    pitch_speed: f32,
-    
-    roll: f32,
-    roll_speed: f32,
-
     max_speed: f32,
     
     forward: Vector3::<f32>,
     up: Vector3::<f32>,
-    left: Vector3::<f32>,
+    right: Vector3::<f32>,
 
     speed: f32,
     acceleration: f32,
@@ -31,23 +25,20 @@ pub struct Plane {
 }
 
 impl Plane {
+    pub const PITCH_SPEED: f32 = 0.01;
+    pub const ROLL_SPEED: f32 = 0.01;
+
     pub fn new(body: Model, propeller: Model, position: Vector3<f32>) -> Self {
         Self {
             body,
             propeller,
             position,
-            
-            pitch: 0.0,
-            pitch_speed: 1.00,
-            
-            roll: 0.0,
-            roll_speed: 1.00,
 
             max_speed: 1.5,
             
-            forward: Vector3::new(0.0, 0.0, 0.0),
-            up: Vector3::new(0.0, 0.0, 0.0),
-            left: Vector3::new(0.0, 0.0, 0.0),
+            forward: Vector3::new(0.0, 0.0, -1.0),
+            up: Vector3::new(0.0, 1.0, 0.0),
+            right: Vector3::new(1.0, 0.0, 0.0),
             
             speed: 0.1,
             acceleration: 0.05,
@@ -57,32 +48,34 @@ impl Plane {
         }
     }
 
-    pub fn update(&mut self, key_state: &KeyState) -> () {
+    fn pitch(&mut self, angle: f32) {
+        self.forward = (self.forward * angle.cos() + self.up * angle.sin()).normalize();
+        self.up = self.right.cross(self.forward);
 
-        // pub struct KeyState {
-        //     pub up: bool,
-        //     pub down: bool,
-        //     pub left: bool,
-        //     pub right: bool,
-        //     pub accelerate: bool,
-        //     pub escape: bool,
-        // }
+    }
+
+    fn roll(&mut self, angle: f32) {
+        self.right = (self.right * angle.cos() + self.up * angle.sin()).normalize();
+        self.up = self.right.cross(self.forward);
+    }
+
+    pub fn update(&mut self, key_state: &KeyState) -> () {
 
         //pitch
         if key_state.up {
-            self.pitch = self.pitch + self.pitch_speed;
+            self.pitch(Self::PITCH_SPEED);
         }
 
         if key_state.down {
-            self.pitch = self.pitch - self.pitch_speed;
+            self.pitch(-Self::PITCH_SPEED);
         }
 
         if key_state.left {
-            self.roll = self.roll - self.roll_speed;
+            self.roll(Self::ROLL_SPEED);
         }
 
         if key_state.right {
-            self.roll = self.roll + self.roll_speed;
+            self.roll(-Self::ROLL_SPEED);
         }
         self.speed -= 0.001;
         if key_state.accelerate{
@@ -91,15 +84,6 @@ impl Plane {
 
         self.speed = self.speed.clamp(0.0, self.max_speed);
 
-        let pitch =  Matrix4::from_angle_x(Deg(self.pitch));
-        let roll =  Matrix4::from_angle_z(Deg(self.roll));
-
-        self.forward = (roll * pitch * Vector4::new(0.0, 0.0, 1.0, 0.0)).xyz().normalize();
-        self.up = (roll * pitch * Vector4::new(0.0, 1.0, 0.0, 0.0)).xyz().normalize();
-        self.left = (roll * pitch * Vector4::new(1.0, 0.0, 0.0, 0.0)).xyz().normalize();
-
-        println!("{:?}, {:?}, {:?}", self.left, self.up, self.forward);
-
         self.position += self.forward * self.speed;
     }
 
@@ -107,13 +91,17 @@ impl Plane {
         let mut matrix = Matrix4::identity();
         let translation = Matrix4::from_translation(self.position);
 
+        let right = self.right;
+        let forward = self.forward;
+        let up = self.up;
 
+        let plane_rot = Matrix4::new(
+            right.x, right.y, right.z, 0.0,
+            up.x, up.y, up.z, 0.0,
+            forward.x, forward.y, forward.z,0.0,
+            0.0, 0.0, 0.0, 1.0,
+        );
         
-        let pitch =  Matrix4::from_axis_angle(self.left, Deg(self.pitch));
-        let roll =  Matrix4::from_axis_angle(self.forward, Deg(self.roll));
-
-        let plane_rot = roll * pitch;
-
         matrix = translation * plane_rot * matrix;
         self.body.render(gl, matrix, time, cam_per);
 
