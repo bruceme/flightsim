@@ -1,10 +1,7 @@
 use cgmath::{Matrix4, Vector3};
 
 use crate::{
-    asset_manager::{AssetManager, Object},
-    input_handler::KeyState,
-    model::Model,
-    window_handler::GlContext,
+    asset_manager, input_handler::KeyState, mesh::Mesh, model::Model, window_handler::GlContext,
 };
 
 pub struct Entity {
@@ -15,7 +12,6 @@ pub struct Entity {
 impl Entity {
     pub fn new(
         gl: &GlContext,
-        asset_manager: &AssetManager,
         object_file: &str,
         vert_shader: &'static str,
         frag_shader: &'static str,
@@ -24,14 +20,19 @@ impl Entity {
     ) -> Self {
         Self {
             position,
-            model: asset_manager.load_obj(gl, object_file, vert_shader, frag_shader, texture_files),
+            model: asset_manager::load_object(
+                gl,
+                object_file,
+                vert_shader,
+                frag_shader,
+                texture_files,
+            ),
         }
     }
 
     pub fn new_obj(
         gl: &GlContext,
-        asset_manager: &AssetManager,
-        object: Object,
+        object: Mesh,
         vert_shader: &'static str,
         frag_shader: &'static str,
         texture_files: &[&str],
@@ -39,7 +40,7 @@ impl Entity {
     ) -> Self {
         Self {
             position,
-            model: asset_manager.load_obj_preloaded(
+            model: asset_manager::load_obj_preloaded(
                 gl,
                 object,
                 vert_shader,

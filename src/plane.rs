@@ -1,4 +1,4 @@
-use cgmath::{EuclideanSpace, InnerSpace, Matrix4, Point3, Rad, Vector3, Vector4, Deg};
+use cgmath::{Deg, EuclideanSpace, InnerSpace, Matrix4, Point3, Rad, Vector3, Vector4};
 
 use crate::{camera::Camera, input_handler::KeyState, model::Model, window_handler::GlContext};
 
@@ -34,9 +34,9 @@ impl Plane {
             scale: 0.25,
             position,
 
-            forward: Vector3::new(0.0, 0.0, -1.0),
+            forward: Vector3::new(0.0, 0.0, 1.0),
             up: Vector3::new(0.0, 1.0, 0.0),
-            right: Vector3::new(1.0, 0.0, 0.0),
+            right: Vector3::new(-1.0, 0.0, 0.0),
 
             pitch_velocity: 0.0,
             roll_velocity: 0.0,

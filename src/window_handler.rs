@@ -102,6 +102,8 @@ impl WindowHandler {
             let mut input_handler = InputHandler::new();
             unsafe {
                 gl.enable(glow::DEPTH_TEST);
+                gl.enable(glow::BLEND);
+                gl.blend_func(glow::SRC_ALPHA, glow::ONE_MINUS_SRC_ALPHA);
                 gl.clear_color(0.0, 0.0, 0.0, 1.0);
             }
 

@@ -1,6 +1,12 @@
 use crate::{
-    asset_manager::AssetManager, camera::Camera, entity::Entity, input_handler::KeyState,
-    mesh_factory::MeshFactory, plane::Plane, window_handler::GlContext,
+    asset_manager,
+    camera::Camera,
+    entity::Entity,
+    input_handler::KeyState,
+    mesh_factory::{self},
+    plane::Plane,
+    water::Water,
+    window_handler::GlContext,
 };
 use cgmath::{Point3, Vector3};
 use glow::HasContext;
@@ -9,16 +15,15 @@ pub struct World {
     gl: GlContext,
     objects: Vec<Entity>,
     plane: Plane,
+    water: Water,
     skybox: Entity,
 }
 
 impl World {
     pub fn new(gl: &GlContext) -> Self {
         let mut objects = Vec::<Entity>::new();
-        let asset_manager = AssetManager::new();
         let skybox = Entity::new(
             gl,
-            &asset_manager,
             "assets/skybox/skybox.obj",
             "assets/skybox/skybox.vert",
             "assets/skybox/skybox.frag",
@@ -26,30 +31,36 @@ impl World {
             Vector3::new(0.0, 0.0, 0.0),
         );
 
+        let ground_image = "assets/surface/surface_extra_smol.png";
+        let scale = 10.0;
+        let height_ext = 2.0;
+
         let surface = Entity::new_obj(
             gl,
-            &asset_manager,
-            MeshFactory::generate_surface("assets/surface/surface.png", 10.0, 2.0),
+            mesh_factory::generate_surface(ground_image, scale, height_ext),
             "assets/surface/surface.vert",
             "assets/surface/surface.frag",
-            &["assets/surface/surface.png"],
+            &["assets/surface/surface_extra_smol.png"],
             Vector3::new(0.0, 0.0, 0.0),
         );
         objects.push(surface);
 
+        let size = imagesize::size(ground_image).unwrap();
+        let water = Water::new(gl, (size.width, size.height), scale, height_ext);
+
         let plane = Plane::new(
-            asset_manager.load_obj(
+            asset_manager::load_object(
                 gl,
                 "assets/plane/body.obj",
-                "assets/plane/body.vert",
-                "assets/plane/body.frag",
+                "assets/plane/plane.vert",
+                "assets/plane/plane.frag",
                 &["assets/plane/plane_mirror_y.png"],
             ),
-            asset_manager.load_obj(
+            asset_manager::load_object(
                 gl,
                 "assets/plane/propeller.obj",
-                "assets/plane/propeller.vert",
-                "assets/plane/propeller.frag",
+                "assets/plane/plane.vert",
+                "assets/plane/plane.frag",
                 &["assets/plane/plane_mirror_y.png"],
             ),
             Vector3::new(0.0, -2.0, -5.0),
@@ -60,6 +71,7 @@ impl World {
             objects,
             plane,
             skybox,
+            water,
         }
     }
 
@@ -78,9 +90,9 @@ impl World {
             self.gl.clear(glow::DEPTH_BUFFER_BIT);
         }
         self.plane.render(&self.gl, time, camera);
-
         self.objects
             .iter()
             .for_each(|object| object.render(&self.gl, time, &camera.to_view_matrix()));
+        self.water.render(&self.gl, time, &camera.to_view_matrix());
     }
 }

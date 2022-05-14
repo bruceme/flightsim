@@ -399,11 +399,11 @@ dependencies = [
 name = "flightsim"
 version = "0.1.0"
 dependencies = [
- "bytemuck",
  "cgmath",
  "glow",
  "glutin",
  "image",
+ "imagesize",
  "obj-rs",
 ]
 
@@ -611,6 +611,12 @@ dependencies = [
  "scoped_threadpool",
  "tiff",
 ]
+
+[[package]]
+name = "imagesize"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00b3b62f4e783e38afa07b51eaaa789be2fba03dbe29a05a1a906eb64feb987d"
 
 [[package]]
 name = "inflate"

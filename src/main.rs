@@ -8,9 +8,11 @@ mod camera;
 mod entity;
 mod helper;
 mod input_handler;
+mod mesh;
 mod mesh_factory;
 mod model;
 mod plane;
+mod water;
 mod window_handler;
 mod world;
 

@@ -1,30 +1,18 @@
 use cgmath::Matrix4;
 use glow::{Context, HasContext, NativeProgram, NativeVertexArray, Texture};
 
+use crate::mesh::Mesh;
 use crate::{helper::AsRawBytes, window_handler::GlContext};
 
 pub struct Model {
-    pub vertices: Vec<[f32; 3]>,
-    pub texies: Vec<[f32; 2]>,
-    pub normals: Vec<[f32; 3]>,
-    pub indices: Vec<u32>,
-
+    pub mesh: Mesh,
     vao: NativeVertexArray,
-
     program: NativeProgram,
     textures: Vec<Texture>,
 }
 
 impl Model {
-    pub fn new(
-        gl: &GlContext,
-        vertices: Vec<[f32; 3]>,
-        texies: Vec<[f32; 2]>,
-        normals: Vec<[f32; 3]>,
-        indices: Vec<u32>,
-        program: NativeProgram,
-        textures: Vec<Texture>,
-    ) -> Self {
+    pub fn new(gl: &GlContext, mesh: Mesh, program: NativeProgram, textures: Vec<Texture>) -> Self {
         let vao = unsafe {
             let vao = gl.create_vertex_array().unwrap();
             gl.bind_vertex_array(Some(vao));
@@ -33,37 +21,37 @@ impl Model {
             gl.bind_buffer(glow::ARRAY_BUFFER, Some(vertices_buf));
             gl.buffer_data_u8_slice(
                 glow::ARRAY_BUFFER,
-                vertices.as_raw_bytes(),
+                mesh.vertices.as_raw_bytes(),
                 glow::STATIC_DRAW,
             );
             gl.vertex_attrib_pointer_f32(
-                gl.get_attrib_location(program, "vertices").unwrap(),
+                gl.get_attrib_location(program, "position").unwrap(),
                 3,
                 glow::FLOAT,
                 false,
                 0,
                 0,
             );
-            gl.enable_vertex_attrib_array(gl.get_attrib_location(program, "vertices").unwrap());
+            gl.enable_vertex_attrib_array(gl.get_attrib_location(program, "position").unwrap());
 
-            if let Some(texture_location) = gl.get_attrib_location(program, "texies") {
+            if let Some(texture_location) = gl.get_attrib_location(program, "tex") {
                 let texies_buf = gl.create_buffer().unwrap();
                 gl.bind_buffer(glow::ARRAY_BUFFER, Some(texies_buf));
                 gl.buffer_data_u8_slice(
                     glow::ARRAY_BUFFER,
-                    texies.as_raw_bytes(),
+                    mesh.texies.as_raw_bytes(),
                     glow::STATIC_DRAW,
                 );
                 gl.vertex_attrib_pointer_f32(texture_location, 2, glow::FLOAT, false, 0, 0);
                 gl.enable_vertex_attrib_array(texture_location);
             };
 
-            if let Some(normals_location) = gl.get_attrib_location(program, "normals") {
+            if let Some(normals_location) = gl.get_attrib_location(program, "normal") {
                 let normals_buf = gl.create_buffer().unwrap();
                 gl.bind_buffer(glow::ARRAY_BUFFER, Some(normals_buf));
                 gl.buffer_data_u8_slice(
                     glow::ARRAY_BUFFER,
-                    normals.as_raw_bytes(),
+                    mesh.normals.as_raw_bytes(),
                     glow::STATIC_DRAW,
                 );
                 gl.vertex_attrib_pointer_f32(normals_location, 3, glow::FLOAT, false, 0, 0);
@@ -74,7 +62,7 @@ impl Model {
             gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(indices_buf));
             gl.buffer_data_u8_slice(
                 glow::ELEMENT_ARRAY_BUFFER,
-                indices.as_raw_bytes(),
+                mesh.indices.as_raw_bytes(),
                 glow::STATIC_DRAW,
             );
 
@@ -82,10 +70,7 @@ impl Model {
         };
 
         Self {
-            vertices,
-            texies,
-            normals,
-            indices,
+            mesh,
             vao,
             program,
             textures,
@@ -124,7 +109,7 @@ impl Model {
             );
             gl.draw_elements(
                 glow::TRIANGLES,
-                self.indices.len() as i32,
+                self.mesh.indices.len() as i32,
                 glow::UNSIGNED_INT,
                 0,
             );
