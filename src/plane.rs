@@ -87,14 +87,14 @@ impl Plane {
         }
         self.velocity = self.velocity.clamp(0.5, 2.0);
         if key_state.turbo {
-            self.velocity = 50.0;
+            self.velocity = 10.0;
         }
 
         self.position += self.forward * self.velocity;
     }
 
     pub fn render(&mut self, gl: &GlContext, time: &f32, camera: &mut Camera) {
-        camera.perspective.fovy = Deg(80.0 + self.velocity * 20.0).into();
+        camera.perspective.fovy = Deg((80.0 + self.velocity * 20.0).clamp(80.0, 120.0)).into();
         let translation = Matrix4::from_translation(self.position);
 
         let right = self.right;
