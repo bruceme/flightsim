@@ -43,7 +43,7 @@ impl Plane {
 
             velocity: 0.1,
             propeller_rotation: 0.0,
-            camera_offset: Vector3::new(0.0, 3.0, -15.0),
+            camera_offset: Vector3::new(0.0, 3.0, -12.0),
         }
     }
 
@@ -94,7 +94,7 @@ impl Plane {
     }
 
     pub fn render(&mut self, gl: &GlContext, time: &f32, camera: &mut Camera) {
-        camera.perspective.fovy = Deg((80.0 + self.velocity * 20.0).clamp(80.0, 120.0)).into();
+        camera.perspective.fovy = Deg((70.0 + self.velocity * 17.5).clamp(70.0, 105.0)).into();
         let translation = Matrix4::from_translation(self.position);
 
         let right = self.right;
@@ -116,7 +116,7 @@ impl Plane {
         camera.direction = self.forward;
         camera.up = self.up;
         camera.update_view();
-        self.body.render(gl, matrix, time, &camera.to_view_matrix());
+        self.body.render(gl, matrix, time, camera);
 
         let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
         let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
@@ -128,6 +128,6 @@ impl Plane {
         matrix = matrix * spin;
 
         self.propeller
-            .render(gl, matrix, time, &camera.to_view_matrix());
+            .render(gl, matrix, time, camera);
     }
 }

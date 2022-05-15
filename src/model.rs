@@ -1,6 +1,7 @@
 use cgmath::Matrix4;
 use glow::{Context, HasContext, NativeProgram, NativeVertexArray, Texture};
 
+use crate::camera::Camera;
 use crate::mesh::Mesh;
 use crate::{helper::AsRawBytes, window_handler::GlContext};
 
@@ -77,7 +78,7 @@ impl Model {
         }
     }
 
-    pub fn render(&self, gl: &Context, matrix: Matrix4<f32>, time: &f32, cam_per: &[f32; 16]) {
+    pub fn render(&self, gl: &Context, matrix: Matrix4<f32>, time: &f32, camera: &mut Camera) {
         let transformation: [f32; 16] = *matrix.as_ref();
         unsafe {
             gl.bind_vertex_array(Some(self.vao));
@@ -103,9 +104,14 @@ impl Model {
                 &transformation,
             );
             gl.uniform_matrix_4_f32_slice(
+                gl.get_uniform_location(self.program, "projection_view").as_ref(),
+                false,
+                &camera.to_projection_view_matrix(),
+            );
+            gl.uniform_matrix_4_f32_slice(
                 gl.get_uniform_location(self.program, "view").as_ref(),
                 false,
-                cam_per,
+                &camera.to_view_matrix(),
             );
             gl.draw_elements(
                 glow::TRIANGLES,

@@ -10,6 +10,7 @@ out vec3 frag_position;
 
 uniform float time;
 uniform mat4 view;
+uniform mat4 projection_view;
 uniform mat4 transformation;
 
 void main(void)
@@ -18,5 +19,5 @@ void main(void)
     frag_normal = normal;
 	frag_position = position;
 
-	gl_Position = view * transformation * vec4(position, 1.0);
+	gl_Position = projection_view * transformation * vec4(position, 1.0);
 }

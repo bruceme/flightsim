@@ -16,8 +16,20 @@ impl Camera {
     pub fn to_view_matrix(&self) -> [f32; 16] {
         unsafe {
             std::mem::transmute_copy::<_, [f32; 16]>(
+                &(self.view),
+            )
+        }
+    }
+
+    pub fn to_projection_view_matrix(&self) -> [f32; 16] {
+        unsafe {
+            std::mem::transmute_copy::<_, [f32; 16]>(
                 &(Matrix4::from(self.perspective.to_perspective()) * self.view),
             )
         }
     }
+
+    
+
+    
 }

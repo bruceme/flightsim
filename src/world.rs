@@ -85,14 +85,14 @@ impl World {
     pub fn render(&mut self, time: &f32, camera: &mut Camera) {
         camera.eye = Point3::new(0.01, 0.0, 0.01);
         camera.update_view();
-        self.skybox.render(&self.gl, time, &camera.to_view_matrix());
+        self.skybox.render(&self.gl, time, camera);
         unsafe {
             self.gl.clear(glow::DEPTH_BUFFER_BIT);
         }
         self.plane.render(&self.gl, time, camera);
         self.objects
             .iter()
-            .for_each(|object| object.render(&self.gl, time, &camera.to_view_matrix()));
-        self.water.render(&self.gl, time, &camera.to_view_matrix());
+            .for_each(|object| object.render(&self.gl, time, camera));
+        self.water.render(&self.gl, time, camera);
     }
 }

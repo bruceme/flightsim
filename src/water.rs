@@ -1,6 +1,6 @@
 use cgmath::{Matrix4, SquareMatrix};
 
-use crate::{asset_manager, mesh::Mesh, model::Model, window_handler::GlContext};
+use crate::{asset_manager, mesh::Mesh, model::Model, window_handler::GlContext, camera::Camera};
 
 pub struct Water {
     model: Model,
@@ -52,8 +52,8 @@ impl Water {
         }
     }
 
-    pub fn render(&self, gl: &GlContext, time: &f32, cam_per: &[f32; 16]) {
+    pub fn render(&self, gl: &GlContext, time: &f32, camera: &mut Camera) {
         let matrix = Matrix4::identity();
-        self.model.render(gl, matrix, time, cam_per);
+        self.model.render(gl, matrix, time, camera);
     }
 }

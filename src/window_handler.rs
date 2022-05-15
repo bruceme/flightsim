@@ -112,7 +112,7 @@ impl WindowHandler {
                 aspect: window.window().inner_size().width as f32
                     / window.window().inner_size().height as f32,
                 near: 0.1,
-                far: 100000.0,
+                far: 15_000.0,
             };
 
             let eye = Point3::<f32>::new(0.0, 0.0, 0.0);

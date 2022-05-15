@@ -8,6 +8,7 @@ out vec2 frag_tex;
 out vec3 frag_normal;
 
 uniform mat4 view;
+uniform mat4 projection_view;
 uniform mat4 transformation;
 
 void main(void)
@@ -15,5 +16,5 @@ void main(void)
 	frag_tex = tex;
     frag_normal = normal;
 
-	gl_Position = view * transformation * vec4(position, 1.0);
+	gl_Position = projection_view * transformation * vec4(position, 1.0);
 }

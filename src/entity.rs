@@ -1,7 +1,7 @@
 use cgmath::{Matrix4, Vector3};
 
 use crate::{
-    asset_manager, input_handler::KeyState, mesh::Mesh, model::Model, window_handler::GlContext,
+    asset_manager, input_handler::KeyState, mesh::Mesh, model::Model, window_handler::GlContext, camera::Camera,
 };
 
 pub struct Entity {
@@ -52,8 +52,8 @@ impl Entity {
 
     pub fn update(&self, _key_state: &KeyState) {}
 
-    pub fn render(&self, gl: &GlContext, time: &f32, cam_per: &[f32; 16]) {
+    pub fn render(&self, gl: &GlContext, time: &f32, camera: &mut Camera) {
         let matrix = Matrix4::from_translation(self.position);
-        self.model.render(gl, matrix, time, cam_per);
+        self.model.render(gl, matrix, time, camera);
     }
 }
