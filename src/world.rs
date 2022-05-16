@@ -31,16 +31,16 @@ impl World {
             Vector3::new(0.0, 0.0, 0.0),
         );
 
-        let ground_image = "assets/surface/surface_extra_smol.png";
-        let scale = 10.0;
-        let height_ext = 2.0;
+        let ground_image = "assets/surface/surface.png";
+        let scale = 5.0;
+        let height_ext = 1.0;
 
         let surface = Entity::new_obj(
             gl,
             mesh_factory::generate_surface(ground_image, scale, height_ext),
             "assets/surface/surface.vert",
             "assets/surface/surface.frag",
-            &["assets/surface/surface_extra_smol.png"],
+            &["assets/surface/surface_texture.png"],
             Vector3::new(0.0, 0.0, 0.0),
         );
         objects.push(surface);
