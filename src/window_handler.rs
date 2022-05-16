@@ -74,7 +74,7 @@ impl WindowHandler {
                 .with_vsync(vsync)
                 .with_depth_buffer(24)
                 .with_double_buffer(Some(true))
-                .with_multisampling(16)
+                .with_multisampling(2)
                 .build_windowed(window_builder, &event_loop)
                 .unwrap()
                 .make_current()

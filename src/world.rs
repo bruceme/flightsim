@@ -34,6 +34,7 @@ impl World {
         let ground_image = "assets/surface/surface.png";
         let scale = 5.0;
         let height_ext = 1.0;
+        let ground_position = Vector3::<f32>::new(-1250.0 * scale, -300.0 * height_ext, -1250.0 * scale);
 
         let surface = Entity::new_obj(
             gl,
@@ -41,12 +42,12 @@ impl World {
             "assets/surface/surface.vert",
             "assets/surface/surface.frag",
             &["assets/surface/surface_texture.png"],
-            Vector3::new(0.0, 0.0, 0.0),
+            ground_position,
         );
         objects.push(surface);
 
         let size = imagesize::size(ground_image).unwrap();
-        let water = Water::new(gl, (size.width, size.height), scale, height_ext);
+        let water = Water::new(gl, (size.width, size.height), scale, height_ext, ground_position);
 
         let plane = Plane::new(
             asset_manager::load_object(
