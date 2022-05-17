@@ -85,8 +85,7 @@ impl Plane {
         self.pitch(self.pitch_velocity);
         self.roll(self.roll_velocity);
 
-        self.velocity.y -= Self::GRAVITY;
-        self.velocity *= 1.0 - Self::DRAG;
+        
 
         let acc = if key_state.turbo {
             0.05
@@ -97,16 +96,23 @@ impl Plane {
         };
 
         let steer = (self.forward - self.velocity) * 0.003;
-        println!("{}", steer.magnitude());
+        //println!("{}", steer.magnitude());
 
         self.velocity += self.forward * acc;
         self.velocity += steer;
 
+        
+        self.velocity.y -= (Self::GRAVITY - Self::LIFT * self.forward.magnitude()).clamp(0.0, Self::GRAVITY);
+
+        self.velocity.y -= Self::GRAVITY;
         let hor = self.velocity.xz();
         self.velocity.y += hor.magnitude() * Self::LIFT;
 
+        self.velocity *= 1.0 - Self::DRAG;
+
         self.position += self.velocity;
-        println!("{}", self.velocity.magnitude());
+        //println!("{:?}",self.forward);
+        //println!("{}", self.velocity.magnitude());
     }
 
     pub fn render(&mut self, gl: &GlContext, time: &f32, camera: &mut Camera) {

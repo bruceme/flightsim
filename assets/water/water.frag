@@ -14,9 +14,9 @@ uniform mat4 transformation;
 void main(void)
 {
 	vec3 water_color = vec3(1, 1, 1);
-	float specular_exponent = 20.0;
+	float specular_exponent = 50.0;
 
-	vec3 light_dir = normalize(vec3(-1, -1, 0));
+	vec3 light_dir = normalize(vec3(0.5, 0, 1.0));
 	vec3 normal = normalize(texture(texture0, frag_tex).xyz);
 
 	vec3 v_normal = mat3(view * transformation) * normal;
