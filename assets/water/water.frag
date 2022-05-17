@@ -16,7 +16,7 @@ void main(void)
 	vec3 water_color = vec3(1, 1, 1);
 	float specular_exponent = 20.0;
 
-	vec3 light_dir = normalize(vec3(-1, 1, -1));
+	vec3 light_dir = normalize(vec3(-1, -1, 0));
 	vec3 normal = texture(texture0, frag_tex).xyz;
 	normal = normalize(normal * 2.0 - 1.0);
 

@@ -24,7 +24,7 @@ impl Water {
             vertex[2] = vertex[2] * scale * size.1 as f32;
         }
 
-        let texies = vec![[0.0, 1.0], [1.0, 1.0], [0.0, 0.0], [0.0, 1.0]];
+        let texies = vec![[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]];
 
         let normals = vec![
             [0.0, 1.0, 0.0],

@@ -39,3 +39,5 @@
 ## Resources
 
 [Plane](https://sketchfab.com/3d-models/low-poly-plane-76230052903540e9aeb46b7db35329e4)
+[Skybox(unknown origin, this is where we found it)](https://www.keithlantz.net/2011/10/rendering-a-skybox-using-a-cube-map-with-opengl-and-glsl/)
+[Skybox(also found here)](https://doc.babylonjs.com/divingDeeper/environment/skybox)

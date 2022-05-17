@@ -47,6 +47,7 @@ impl Plane {
         }
     }
 
+    // Solution based on https://cs.lmu.edu/~ray/notes/flightsimulator/
     fn pitch(&mut self, angle: f32) {
         self.forward = (self.forward * angle.cos() + self.up * angle.sin()).normalize();
         self.up = self.right.cross(self.forward);
@@ -57,12 +58,12 @@ impl Plane {
         self.up = self.right.cross(self.forward);
     }
 
+    
     pub fn update(&mut self, key_state: &KeyState) {
         //pitch
         if key_state.up {
             self.pitch_velocity -= Self::PITCH_SPEED;
         }
-
         if key_state.down {
             self.pitch_velocity += Self::PITCH_SPEED;
         }
@@ -120,7 +121,7 @@ impl Plane {
 
         let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
         let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
-        self.propeller_rotation += *time * 1000.0;
+        self.propeller_rotation += *time * 20.0 * self.velocity;
 
         let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
 
