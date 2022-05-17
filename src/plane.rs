@@ -16,7 +16,7 @@ pub struct Plane {
     pitch_velocity: f32,
     roll_velocity: f32,
 
-    velocity: f32,
+    velocity: Vector3<f32>,
 
     propeller_rotation: f32,
     camera_offset: Vector3<f32>,
@@ -25,6 +25,9 @@ pub struct Plane {
 impl Plane {
     pub const PITCH_SPEED: f32 = 0.00005;
     pub const ROLL_SPEED: f32 = 0.0001;
+    pub const GRAVITY: f32 = 0.001;
+    pub const DRAG: f32 = 0.003;
+    pub const LIFT: f32 = 0.0005;
 
     pub fn new(body: Model, propeller: Model, position: Vector3<f32>) -> Self {
         Self {
@@ -41,7 +44,7 @@ impl Plane {
             pitch_velocity: 0.0,
             roll_velocity: 0.0,
 
-            velocity: 0.1,
+            velocity: Vector3::new(0.0, 0.0, 1.0),
             propeller_rotation: 0.0,
             camera_offset: Vector3::new(0.0, 3.0, -12.0),
         }
@@ -82,20 +85,32 @@ impl Plane {
         self.pitch(self.pitch_velocity);
         self.roll(self.roll_velocity);
 
-        self.velocity -= 0.001;
-        if key_state.accelerate {
-            self.velocity += 0.005;
-        }
-        self.velocity = self.velocity.clamp(0.5, 2.0);
-        if key_state.turbo {
-            self.velocity = 10.0;
-        }
+        self.velocity.y -= Self::GRAVITY;
+        self.velocity *= 1.0 - Self::DRAG;
 
-        self.position += self.forward * self.velocity;
+        let acc = if key_state.turbo {
+            0.05
+        } else if key_state.accelerate {
+            0.005
+        } else {
+            0.0005
+        };
+
+        let steer = (self.forward - self.velocity) * 0.003;
+        println!("{}", steer.magnitude());
+
+        self.velocity += self.forward * acc;
+        self.velocity += steer;
+
+        let hor = self.velocity.xz();
+        self.velocity.y += hor.magnitude() * Self::LIFT;
+
+        self.position += self.velocity;
+        println!("{}", self.velocity.magnitude());
     }
 
     pub fn render(&mut self, gl: &GlContext, time: &f32, camera: &mut Camera) {
-        camera.perspective.fovy = Deg((70.0 + self.velocity * 17.5).clamp(70.0, 105.0)).into();
+        camera.perspective.fovy = Deg((70.0 + self.velocity.magnitude() * 40.0).clamp(70.0, 105.0)).into();
         let translation = Matrix4::from_translation(self.position);
 
         let right = self.right;
@@ -121,7 +136,7 @@ impl Plane {
 
         let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
         let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
-        self.propeller_rotation += *time * 20.0 * self.velocity;
+        self.propeller_rotation += *time * 20.0 * self.velocity.magnitude();
 
         let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
 

@@ -15,7 +15,7 @@ uniform mat4 transformation;
 
 void main(void)
 {
-	frag_tex = tex * 30;
+	frag_tex = tex * 100;
     frag_normal = normal;
 	frag_position = position;
 

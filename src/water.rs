@@ -1,5 +1,4 @@
-use cgmath::{Matrix4, SquareMatrix, Vector3};
-use glutin::dpi::Position;
+use cgmath::{Matrix4, Vector3};
 
 use crate::{asset_manager, mesh::Mesh, model::Model, window_handler::GlContext, camera::Camera};
 

@@ -17,8 +17,7 @@ void main(void)
 	float specular_exponent = 20.0;
 
 	vec3 light_dir = normalize(vec3(-1, -1, 0));
-	vec3 normal = texture(texture0, frag_tex).xyz;
-	normal = normalize(normal * 2.0 - 1.0);
+	vec3 normal = normalize(texture(texture0, frag_tex).xyz);
 
 	vec3 v_normal = mat3(view * transformation) * normal;
 	vec3 v_position = vec3(view * transformation * vec4(frag_position, 1.0));
