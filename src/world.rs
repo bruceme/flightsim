@@ -77,9 +77,6 @@ impl World {
     }
 
     pub fn update(&mut self, key_state: &KeyState) {
-        self.objects
-            .iter()
-            .for_each(|object| object.update(key_state));
         self.plane.update(key_state);
     }
 

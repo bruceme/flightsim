@@ -6,17 +6,17 @@
 
 | Feature               | Status |
 | --------------------- | ------ |
-| Surface               | ❌      |
-| Geographic heightdata | ❌      |
-| Geographic texture    | ❌      |
-| Water                 | ❌      |
-| Specular light water  | ❌      |
-| Light source, sun     | ❌      |
-| Plane model           | ❌      |
-| Plane controls        | ❌      |
-| Plane physics         | ❌      |
-| Plane animations      | ❌      |
-| Skybox                | ❌      |
+| Surface               | ✔️      |
+| Geographic heightdata | ✔️      |
+| Geographic texture    | ✔️      |
+| Water                 | ✔️      |
+| Specular light water  | ✔️      |
+| Light source, sun     | ✔️      |
+| Plane model           | ✔️      |
+| Plane controls        | ✔️      |
+| Plane physics         | ✔️      |
+| Plane animations      | ✔️      |
+| Skybox                | ✔️      |
 
 ### Might be implemented
 
@@ -27,7 +27,7 @@
 | Night / Day cycle                       | ❌      |
 | Plane collision                         | ❌      |
 | Land planes                             | ❌      |
-| Water bump map                          | ❌      |
+| Water bump map                          | ✔️      |
 | Simple multiplayer (client authorative) | ❌      |
 | Plane guns                              | ❌      |
 | Plane v plane collision                 | ❌      |

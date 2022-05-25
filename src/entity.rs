@@ -50,8 +50,6 @@ impl Entity {
         }
     }
 
-    pub fn update(&self, _key_state: &KeyState) {}
-
     pub fn render(&self, gl: &GlContext, time: &f32, camera: &mut Camera) {
         let matrix = Matrix4::from_translation(self.position);
         self.model.render(gl, matrix, time, camera);
