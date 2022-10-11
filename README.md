@@ -1,6 +1,6 @@
 # flightsim
 
-![Alt text](screenshot.jpg "Screenshot")
+![Screenshot](screenshot.jpg)
 
 ## Getting Started
 
