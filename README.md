@@ -1,6 +1,6 @@
 # flightsim
 
-![Screenshot](screenshot.jpg)
+![Screenshot](https://github.com/bruceme/flightsim/blob/main/Screenshot.jpg?raw=true)
 
 ## Getting Started
 
