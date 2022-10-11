@@ -1,5 +1,13 @@
 # flightsim
 
+![Alt text](screenshot.jpg "Screenshot")
+
+## Getting Started
+
+1. Clone this repo
+1. Install OpenGL on your machine 
+1. Execute: '''Cargo Run'''
+
 ## Features
 
 ### To be implemented
