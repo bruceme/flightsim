@@ -4,9 +4,10 @@
 
 ## Getting Started
 
-1. Clone this repo
-1. Install OpenGL on your machine 
-1. Execute: '''Cargo Run'''
+1. Install [OpenGL](https://www.opengl.org/) 
+1. Install [Rust](https://rustup.rs/)
+1. clone this repo, `cd flightsim`
+1. `cargo run`
 
 ## Features
 
