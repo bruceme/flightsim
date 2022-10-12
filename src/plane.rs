@@ -1,9 +1,12 @@
-use cgmath::{Deg, EuclideanSpace, InnerSpace, Matrix4, Point3, Vector3, Vector4};
+use cgmath::{Deg, EuclideanSpace, InnerSpace, Matrix4, Point3, Rad, Vector3, Vector4};
 use glow_glyph::{GlyphBrushBuilder, ab_glyph, Section, Text};
 
-use crate::{camera::Camera, input_handler::KeyState, window_handler::GlContext};
+use crate::{camera::Camera, input_handler::KeyState, model::Model, window_handler::GlContext};
 
 pub struct Plane {
+    body: Model,
+    propeller: Model,
+
     scale: f32,
     position: Vector3<f32>,
 
@@ -16,6 +19,7 @@ pub struct Plane {
 
     velocity: Vector3<f32>,
 
+    propeller_rotation: f32,
     camera_offset: Vector3<f32>,
 }
 
@@ -26,8 +30,10 @@ impl Plane {
     pub const DRAG: f32 = 0.003;
     pub const LIFT: f32 = 0.0005;
 
-    pub fn new(position: Vector3<f32>) -> Self {
+    pub fn new(body: Model, propeller: Model, position: Vector3<f32>) -> Self {
         Self {
+            body,
+            propeller,
             scale: 0.25,
             position,
 
@@ -39,6 +45,7 @@ impl Plane {
             roll_velocity: 0.0,
 
             velocity: Vector3::new(0.0, 0.0, 1.0),
+            propeller_rotation: 0.0,
             camera_offset: Vector3::new(0.0, 3.0, -12.0),
         }
     }
@@ -122,7 +129,7 @@ impl Plane {
         );
 
         let scale_matrix = Matrix4::from_scale(self.scale);
-        let matrix = translation * plane_rot * scale_matrix;
+        let mut matrix = translation * plane_rot * scale_matrix;
         let camera_position = (matrix
             * Matrix4::from_translation(self.camera_offset)
             * Vector4::<f32>::new(0.0, 0.0, 0.0, 1.0))
@@ -153,18 +160,18 @@ impl Plane {
         .draw_queued(gl, 800, 600)
         .expect("Draw queued");
 
-        // self.body.render(gl, matrix, time, camera);
+        self.body.render(gl, matrix, time, camera);
 
-        // let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
-        // let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
-        // self.propeller_rotation += *time * 20.0 * self.velocity.magnitude();
+        let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
+        let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
+        self.propeller_rotation += *time * 20.0 * self.velocity.magnitude();
 
-        // let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
+        let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
 
-        // let spin = offset * rotation * rev_offset;
-        // matrix = matrix * spin;
+        let spin = offset * rotation * rev_offset;
+        matrix = matrix * spin;
 
-        // self.propeller
-        //     .render(gl, matrix, time, camera);
+        self.propeller
+            .render(gl, matrix, time, camera);
     }
 }
