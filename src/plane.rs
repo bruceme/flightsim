@@ -108,7 +108,7 @@ impl Plane {
         //println!("{}", self.velocity.magnitude());
     }
 
-    pub fn render(&mut self, gl: &GlContext, camera: &mut Camera) {
+    pub fn render(&mut self, gl: &GlContext, time:&f32, camera: &mut Camera) {
         camera.perspective.fovy = Deg((70.0 + self.velocity.magnitude() * 40.0).clamp(70.0, 105.0)).into();
         let translation = Matrix4::from_translation(self.position);
 
@@ -140,17 +140,17 @@ impl Plane {
         let mut glyph_brush = GlyphBrushBuilder::using_font(inconsolata).build(gl);
 
         glyph_brush.queue(Section {
-            screen_position: (30.0, 90.0),
+            screen_position: (10.0, 10.0),
             bounds: (800.0, 600.0),
             text: vec![Text::default()
-                .with_text("Hello EFIS!")
+                .with_text(&format!("fps:{}", (1.0/time) as u16))
                 .with_color([0.0, 0.0, 0.0, 1.0])
-                .with_scale(40.0)],
+                .with_scale(10.0)],
             ..Section::default()
         });
 
         glyph_brush
-        .draw_queued(&gl, 800, 600)
+        .draw_queued(gl, 800, 600)
         .expect("Draw queued");
 
         // self.body.render(gl, matrix, time, camera);

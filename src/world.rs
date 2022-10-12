@@ -72,7 +72,7 @@ impl World {
         unsafe {
             self.gl.clear(glow::DEPTH_BUFFER_BIT);
         }
-        self.plane.render(&self.gl, camera);
+        self.plane.render(&self.gl, time, camera);
         self.objects
             .iter()
             .for_each(|object| object.render(&self.gl, time, camera));
