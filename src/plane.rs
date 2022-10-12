@@ -138,18 +138,18 @@ impl Plane {
         camera.direction = self.forward;
         camera.up = self.up;
         camera.update_view();
-        self.body.render(gl, matrix, time, camera);
+       // self.body.render(gl, matrix, time, camera);
 
-        let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
-        let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
-        self.propeller_rotation += *time * 20.0 * self.velocity.magnitude();
+        // let offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, -0.1935, 0.0));
+        // let rev_offset = Matrix4::from_translation(Vector3::<f32>::new(0.0, 0.1935, 0.0));
+        // self.propeller_rotation += *time * 20.0 * self.velocity.magnitude();
 
-        let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
+        // let rotation = Matrix4::from_angle_z(Rad(self.propeller_rotation));
 
-        let spin = offset * rotation * rev_offset;
-        matrix = matrix * spin;
+        // let spin = offset * rotation * rev_offset;
+        // matrix = matrix * spin;
 
-        self.propeller
-            .render(gl, matrix, time, camera);
+        // self.propeller
+        //     .render(gl, matrix, time, camera);
     }
 }
