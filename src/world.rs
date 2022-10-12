@@ -1,5 +1,4 @@
 use crate::{
-    asset_manager,
     camera::Camera,
     entity::Entity,
     input_handler::KeyState,
@@ -50,20 +49,6 @@ impl World {
         let water = Water::new(gl, (size.width, size.height), scale, height_ext, ground_position);
 
         let plane = Plane::new(
-            asset_manager::load_object(
-                gl,
-                "assets/plane/body.obj",
-                "assets/plane/plane.vert",
-                "assets/plane/plane.frag",
-                &["assets/plane/plane_mirror_y.png"],
-            ),
-            asset_manager::load_object(
-                gl,
-                "assets/plane/propeller.obj",
-                "assets/plane/plane.vert",
-                "assets/plane/plane.frag",
-                &["assets/plane/plane_mirror_y.png"],
-            ),
             Vector3::new(0.0, -2.0, -5.0),
         );
 
