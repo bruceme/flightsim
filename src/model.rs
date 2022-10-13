@@ -104,7 +104,8 @@ impl Model {
                 &transformation,
             );
             gl.uniform_matrix_4_f32_slice(
-                gl.get_uniform_location(self.program, "projection_view").as_ref(),
+                gl.get_uniform_location(self.program, "projection_view")
+                    .as_ref(),
                 false,
                 &camera.to_projection_view_matrix(),
             );

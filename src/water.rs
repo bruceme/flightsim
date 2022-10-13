@@ -1,14 +1,20 @@
 use cgmath::{Matrix4, Vector3};
 
-use crate::{asset_manager, mesh::Mesh, model::Model, window_handler::GlContext, camera::Camera};
+use crate::{asset_manager, camera::Camera, mesh::Mesh, model::Model, window_handler::GlContext};
 
 pub struct Water {
     model: Model,
-    position: Vector3<f32>
+    position: Vector3<f32>,
 }
 
 impl Water {
-    pub fn new(gl: &GlContext, size: (usize, usize), scale: f32, height: f32, position: Vector3<f32>) -> Self {
+    pub fn new(
+        gl: &GlContext,
+        size: (usize, usize),
+        scale: f32,
+        height: f32,
+        position: Vector3<f32>,
+    ) -> Self {
         let mut vertices = vec![
             [0.0, 0.0, 0.0],
             [1.0, 0.0, 0.0],
@@ -50,12 +56,13 @@ impl Water {
                 program,
                 textures,
             ),
-            position
+            position,
         }
     }
 
     pub fn render(&self, gl: &GlContext, time: &f32, camera: &mut Camera) {
-        let matrix = Matrix4::from_translation(self.position) * Matrix4::from_translation(Vector3::new(0.0, -10.0, 0.0));
+        let matrix = Matrix4::from_translation(self.position)
+            * Matrix4::from_translation(Vector3::new(0.0, -10.0, 0.0));
         self.model.render(gl, matrix, time, camera);
     }
 }

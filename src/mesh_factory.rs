@@ -16,7 +16,7 @@ pub fn generate_surface(heightmap: &str, scale: f32, height_exaggeration: f32) -
     for y in 0..image_height {
         for x in 0..image_width {
             let image::Rgba(data) = image.get_pixel(x, y);
-            
+
             vertices.push([
                 x as f32 * scale,
                 data[0] as f32 * height_exaggeration,

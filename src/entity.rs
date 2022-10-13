@@ -1,8 +1,6 @@
 use cgmath::{Matrix4, Vector3};
 
-use crate::{
-    asset_manager, mesh::Mesh, model::Model, window_handler::GlContext, camera::Camera,
-};
+use crate::{asset_manager, camera::Camera, mesh::Mesh, model::Model, window_handler::GlContext};
 
 pub struct Entity {
     position: Vector3<f32>,
